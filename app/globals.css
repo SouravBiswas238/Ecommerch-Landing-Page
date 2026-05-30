@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DYNAMIC BRAND THEME  ─  CSS Custom Properties
+   These defaults are the original "Good Day" palette.
+   The ThemeProvider (context/ThemeContext.jsx) will overwrite them at
+   runtime with values extracted from the companyData API response,
+   making the whole UI automatically match each restaurant's brand.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root {
+  /* Primary brand colour – buttons, active states, focus rings */
+  --color-primary:        #5F359F;
+  --color-primary-hover:  #7649FD;
+  --color-primary-text:   #ffffff;   /* text that sits ON primary bg */
+  --color-primary-rgb:    95 53 159; /* r g b without commas for opacity tricks */
+
+  /* Secondary brand colour – headings, dark fills */
+  --color-secondary:      #003660;
+  --color-secondary-text: #ffffff;
+  --color-secondary-rgb:  0 54 96;
+
+  /* Accent colour – badges, highlight labels */
+  --color-accent:         #FFDF00;
+  --color-accent-text:    #003660;   /* usually dark on yellow */
+  --color-accent-rgb:     255 223 0;
+
+  /* Page / panel backgrounds */
+  --color-bg:             #FDF8F6;
+  --color-bg-rgb:         253 248 246;
+  --color-surface:        #FFFFFF;
+
+  /* Utility */
+  --color-border:         #E5E7EB;
+  --color-muted:          #808080;
+  --color-body:           #374151;
+  --color-danger:         #dc3545;
+  --color-success:        #198754;
+}
+
+/* ── Custom Animations ──────────────────────────────────────────────────────── */
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(40px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes zoom-in {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slide-left {
+  from { opacity: 0; transform: translateX(100%); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.animate-fade-in   { animation: fade-in 0.25s ease both; }
+.animate-slide-up  { animation: slide-up 0.3s cubic-bezier(0.34,1.56,0.64,1) both; }
+.animate-zoom-in   { animation: zoom-in 0.25s ease both; }
+.animate-slide-left{ animation: slide-left 0.3s cubic-bezier(0.34,1.56,0.64,1) both; }
+
+/* ── Scrollbar hide utility ─────────────────────────────────────────────────── */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Base reset ─────────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-body);
+  font-family: var(--font-inter, system-ui, sans-serif);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Leaflet z-index fix (ensure it doesn't bleed above modals) ─────────────── */
+.leaflet-pane,
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 10 !important;
+}
+
