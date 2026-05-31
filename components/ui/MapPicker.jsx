@@ -1,10 +1,13 @@
 "use client";
 
-import dynamic from "next/dynamic";
+import { lazy, Suspense } from "react";
 
-// Leaflet is browser-only — must be loaded with ssr: false
-const MapPickerInner = dynamic(() => import("./MapPickerInner"), { ssr: false });
+const MapPickerInner = lazy(() => import("./MapPickerInner"));
 
-const MapPicker = (props) => <MapPickerInner {...props} />;
+const MapPicker = (props) => (
+  <Suspense fallback={<div className="h-48 bg-gray-100 rounded-xl animate-pulse"></div>}>
+    <MapPickerInner {...props} />
+  </Suspense>
+);
 
 export default MapPicker;

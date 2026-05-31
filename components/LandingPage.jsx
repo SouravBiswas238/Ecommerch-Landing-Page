@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import dynamic from "next/dynamic";
+import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { ThemeProvider } from "@/context/ThemeContext";
 
 // Hooks
@@ -31,8 +30,8 @@ import TrackOrderDrawer from "@/components/landing/TrackOrderDrawer";
 // Product
 import ProductModal from "@/components/product/ProductModal";
 
-// Checkout (needs browser-only leaflet-geosearch inside)
-const CheckoutModal = dynamic(() => import("@/components/landing/CheckoutModal"), { ssr: false });
+// Checkout (lazy loaded)
+const CheckoutModal = lazy(() => import("@/components/landing/CheckoutModal"));
 
 // ── localStorage helpers for saved orders ──────────────────────────────────
 const loadOrders = () => {
@@ -362,13 +361,15 @@ const LandingPage = ({ companyData }) => {
 
       {/* Checkout Modal */}
       {checkoutOpen && (
-        <CheckoutModal
-          companyId={companyData?.id}
-          cart={cart}
-          cartSubtotal={cartSubtotal}
-          onClose={() => setCheckoutOpen(false)}
-          onSubmit={handleCheckoutSubmit}
-        />
+        <Suspense fallback={null}>
+          <CheckoutModal
+            companyId={companyData?.id}
+            cart={cart}
+            cartSubtotal={cartSubtotal}
+            onClose={() => setCheckoutOpen(false)}
+            onSubmit={handleCheckoutSubmit}
+          />
+        </Suspense>
       )}
 
       {/* Order Success Modal */}
