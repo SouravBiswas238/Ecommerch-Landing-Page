@@ -1,9 +1,7 @@
-import { headers } from "next/headers";
 import LandingPage from "@/components/LandingPage";
 import { getCompanyFromHost } from "@/lib/api";
 
 export default async function HomePage() {
-  const headersList = await headers();
   // Provide fallback just in case 'host' header is missing
   const host = "goodday.aisetechnologies.com";
 
