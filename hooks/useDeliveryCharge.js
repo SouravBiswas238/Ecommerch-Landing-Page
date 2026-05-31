@@ -15,8 +15,8 @@ export const useDeliveryCharge = (companyId, mapLocation, deliveryType) => {
         setDeliveryError("");
         try {
           const data = await fetchDeliveryCharge(companyId, mapLocation.lat, mapLocation.lng);
-          if (data && data.delivery_charge !== undefined) {
-            setDeliveryCharge(data.delivery_charge);
+          if (data && data?.delivery_charge !== undefined) {
+            setDeliveryCharge(data?.delivery_charge);
           }
         } catch (error) {
           const msg =
