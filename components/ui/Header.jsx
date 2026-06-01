@@ -26,7 +26,7 @@ const Header = ({ companyData, cartTotalItems, cartSubtotal, onCartOpen, onTrack
               {brandName}
             </h1>
             <p className="text-xs flex items-center gap-1 font-[Poppins,sans-serif]" style={{ color: "var(--color-muted)" }}>
-              <Clock className="w-3 h-3" style={{ color: "var(--color-accent)" }} /> 15 - 30 Min • Free Delivery
+
             </p>
           </div>
         </div>
@@ -78,7 +78,7 @@ const Header = ({ companyData, cartTotalItems, cartSubtotal, onCartOpen, onTrack
             <span>Cart ({cartTotalItems})</span>
             <span className="text-xs font-extrabold px-2 py-0.5 rounded-full ml-1"
               style={{ background: "var(--color-accent)", color: "var(--color-accent-text)" }}>
-              ${cartSubtotal.toLocaleString()}
+              ${cartSubtotal.toLocaleString()} 
             </span>
           </button>
 

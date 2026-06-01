@@ -12,8 +12,8 @@ const CartDrawer = ({
   onClear,
   onCheckout,
 }) => (
-  <div className="fixed inset-0 z-50 bg-[#000]/60 backdrop-blur-sm md:hidden flex items-end justify-center">
-    <div className="bg-white rounded-t-3xl w-full max-h-[85vh] flex flex-col shadow-2xl animate-slide-up">
+  <div className="fixed inset-0 z-50 bg-[#000]/60 backdrop-blur-sm flex items-end md:items-center justify-center">
+    <div className="bg-white rounded-t-3xl md:rounded-3xl w-full md:w-[400px] max-h-[85vh] flex flex-col shadow-2xl animate-slide-up">
       {/* Handle */}
       <div className="w-12 h-1 bg-[#E5E7EB] rounded-full mx-auto my-3 shrink-0" />
 

@@ -218,12 +218,12 @@ const OptionGroup = ({ groupKey, groupData, selectedMods, onChange }) => {
                         </button>
                       </div>
                       <span className="text-xs font-bold shrink-0" style={{ color: "var(--color-primary)" }}>
-                        {mod.price > 0 ? `+$${(mod.price * currentQty).toLocaleString()}` : "Free"}
+                        {mod.price > 0 ? `+$${(mod.price * currentQty).toLocaleString()}` : "$0"}
                       </span>
                     </>
                   ) : (
                     <span className="text-xs font-bold shrink-0" style={{ color: "var(--color-primary)" }}>
-                      {mod.price > 0 ? `+$${mod.price}` : "Free"}
+                      {mod.price > 0 ? `+$${mod.price}` : "$0"}
                     </span>
                   )}
                 </div>
