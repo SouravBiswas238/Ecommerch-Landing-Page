@@ -1,4 +1,4 @@
-"use client";
+
 
 import { CheckCircle, Clock, MapPin, CreditCard } from "lucide-react";
 

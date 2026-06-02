@@ -1,4 +1,4 @@
-"use client";
+
 
 import { useState, useEffect, useReducer, useCallback } from "react";
 import { generateCustomKey } from "@/lib/cartUtils";

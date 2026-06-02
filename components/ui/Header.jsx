@@ -1,4 +1,4 @@
-"use client";
+
 
 import { Clock, ShoppingBag } from "lucide-react";
 

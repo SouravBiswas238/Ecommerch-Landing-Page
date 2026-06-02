@@ -1,4 +1,4 @@
-"use client";
+
 
 const CategoryFilter = ({ categories, selectedCategory, onSelect }) => (
   <div>

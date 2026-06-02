@@ -1,4 +1,4 @@
-"use client";
+
 
 import { useState } from "react";
 import { Check, Plus, Minus, ChevronDown, ChevronUp } from "lucide-react";

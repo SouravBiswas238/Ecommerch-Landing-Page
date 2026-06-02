@@ -1,7 +1,8 @@
-"use client";
+
 
 import { useState, useEffect } from "react";
 import { X, DollarSign, CreditCard } from "lucide-react";
+import { OpenStreetMapProvider } from "leaflet-geosearch";
 import MapPicker from "@/components/ui/MapPicker";
 import { useDeliveryCharge } from "@/hooks/useDeliveryCharge";
 
@@ -31,12 +32,10 @@ const CheckoutModal = ({
   const [mapSearching, setMapSearching] = useState(false);
   const [geoLoading, setGeoLoading] = useState(false);
   const [formErrors, setFormErrors] = useState({});
-  // Lazy-load osmProvider so it is never imported/run on the server
+
   const [osmProvider, setOsmProvider] = useState(null);
   useEffect(() => {
-    import("leaflet-geosearch").then(({ OpenStreetMapProvider }) => {
-      setOsmProvider(new OpenStreetMapProvider());
-    });
+    setOsmProvider(new OpenStreetMapProvider());
   }, []);
 
   const { deliveryCharge, deliveryChargeLoading, deliveryError } =

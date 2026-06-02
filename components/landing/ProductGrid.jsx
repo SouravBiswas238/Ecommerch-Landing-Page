@@ -1,4 +1,4 @@
-"use client";
+
 
 import { Plus, Minus, Sparkles, Utensils } from "lucide-react";
 import { getSingleProductImage, getProductImage } from "@/lib/imageUtils";

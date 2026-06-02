@@ -1,4 +1,4 @@
-"use client";
+
 
 import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { ThemeProvider } from "@/context/ThemeContext";
@@ -30,8 +30,8 @@ import TrackOrderDrawer from "@/components/landing/TrackOrderDrawer";
 // Product
 import ProductModal from "@/components/product/ProductModal";
 
-// Checkout (lazy loaded)
-const CheckoutModal = lazy(() => import("@/components/landing/CheckoutModal"));
+// Checkout
+import CheckoutModal from "@/components/landing/CheckoutModal";
 
 // ── localStorage helpers for saved orders ──────────────────────────────────
 const loadOrders = () => {
@@ -361,15 +361,13 @@ const LandingPage = ({ companyData }) => {
 
       {/* Checkout Modal */}
       {checkoutOpen && (
-        <Suspense fallback={null}>
-          <CheckoutModal
-            companyId={companyData?.id}
-            cart={cart}
-            cartSubtotal={cartSubtotal}
-            onClose={() => setCheckoutOpen(false)}
-            onSubmit={handleCheckoutSubmit}
-          />
-        </Suspense>
+        <CheckoutModal
+          companyId={companyData?.id}
+          cart={cart}
+          cartSubtotal={cartSubtotal}
+          onClose={() => setCheckoutOpen(false)}
+          onSubmit={handleCheckoutSubmit}
+        />
       )}
 
       {/* Order Success Modal */}

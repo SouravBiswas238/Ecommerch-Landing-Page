@@ -1,4 +1,4 @@
-"use client";
+
 
 import { ShoppingBag, ShoppingCart, Plus, Minus, Trash2, X } from "lucide-react";
 

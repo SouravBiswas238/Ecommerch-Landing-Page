@@ -1,4 +1,4 @@
-"use client";
+
 
 import { X, ShoppingCart } from "lucide-react";
 import TrackOrderSection from "@/components/track/TrackOrderSection";

@@ -1,4 +1,4 @@
-"use client";
+
 
 import { useState, useEffect } from "react";
 import { fetchDeliveryCharge } from "@/lib/api";
@@ -17,6 +17,11 @@ export const useDeliveryCharge = (companyId, mapLocation, deliveryType) => {
           const data = await fetchDeliveryCharge(companyId, mapLocation.lat, mapLocation.lng);
           if (data && data?.delivery_charge !== undefined) {
             setDeliveryCharge(data?.delivery_charge);
+          }
+          if (data?.detail) {
+            setDeliveryError(data?.detail);
+            setDeliveryCharge(0);
+
           }
         } catch (error) {
           const msg =
