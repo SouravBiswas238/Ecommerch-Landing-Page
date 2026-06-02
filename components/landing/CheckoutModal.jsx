@@ -148,9 +148,8 @@ const CheckoutModal = ({
             </label>
             <input
               type="text" required placeholder="e.g. John Doe"
-              className={`w-full bg-[#f9f9f9] border ${
-                formErrors.name ? "border-[#dc3545]" : ""
-              } rounded-xl px-4 py-2.5 text-xs focus:outline-none transition-all`}
+              className={`w-full bg-[#f9f9f9] border ${formErrors.name ? "border-[#dc3545]" : ""
+                } rounded-xl px-4 py-2.5 text-xs focus:outline-none transition-all`}
               style={!formErrors.name ? { borderColor: "var(--color-border)" } : { borderColor: "var(--color-danger)" }}
               value={checkoutForm.name}
               onChange={(e) => { setCheckoutForm((p) => ({ ...p, name: e.target.value })); setFormErrors((p) => ({ ...p, name: "" })); }}
@@ -165,9 +164,8 @@ const CheckoutModal = ({
             </label>
             <input
               type="tel" required placeholder="e.g. 9876543210"
-              className={`w-full bg-[#f9f9f9] border ${
-                formErrors.phone ? "" : ""
-              } rounded-xl px-4 py-2.5 text-xs focus:outline-none transition-all`}
+              className={`w-full bg-[#f9f9f9] border ${formErrors.phone ? "" : ""
+                } rounded-xl px-4 py-2.5 text-xs focus:outline-none transition-all`}
               style={!formErrors.phone ? { borderColor: "var(--color-border)" } : { borderColor: "var(--color-danger)" }}
               value={checkoutForm.phone}
               onChange={(e) => { setCheckoutForm((p) => ({ ...p, phone: e.target.value })); setFormErrors((p) => ({ ...p, phone: "" })); }}

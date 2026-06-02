@@ -19,7 +19,10 @@ export const useDeliveryCharge = (companyId, mapLocation, deliveryType) => {
             setDeliveryCharge(data?.delivery_charge);
           }
           if (data?.detail) {
-            setDeliveryError(data?.detail);
+            const msg =
+              data?.detail ||
+              "Could not calculate delivery fee for this location.";
+            setDeliveryError(msg);
             setDeliveryCharge(0);
 
           }
