@@ -1,5 +1,3 @@
-
-
 /**
  * ThemeContext.jsx
  *
@@ -20,8 +18,6 @@ export function ThemeProvider({ companyData, children }) {
   const theme = useMemo(() => buildTheme(companyData), [companyData]);
   const cssVars = useMemo(() => themeToCssVars(theme), [theme]);
 
-  console.log("ThemeProvider: companyData", companyData);
-
   // Inject CSS variables onto <html> so they cascade to every element
   useEffect(() => {
     const root = document.documentElement;
@@ -30,13 +26,11 @@ export function ThemeProvider({ companyData, children }) {
     });
     // Update body background to match brand bg
     document.body.style.background = theme.bg;
-    document.body.style.color      = theme.bodyText;
+    document.body.style.color = theme.bodyText;
   }, [cssVars, theme]);
 
   return (
-    <ThemeContext.Provider value={theme}>
-      {children}
-    </ThemeContext.Provider>
+    <ThemeContext.Provider value={theme}>{children}</ThemeContext.Provider>
   );
 }
 
