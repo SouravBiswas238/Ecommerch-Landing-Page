@@ -144,11 +144,7 @@ const ProductModal = ({ product, onClose, onAddToCart, currentCartQty = 0, onQty
                 <Flame className="w-2.5 h-2.5" /> Hot
               </span>
             )}
-            {isVeg && (
-              <span className="text-[10px] font-bold bg-[#198754] text-white px-2 py-1 rounded-full flex items-center gap-1">
-                <Leaf className="w-2.5 h-2.5" /> Veg
-              </span>
-            )}
+          
           </div>
 
           {/* Name overlay */}

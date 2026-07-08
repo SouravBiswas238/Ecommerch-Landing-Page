@@ -3,7 +3,7 @@
 import { Sparkles } from "lucide-react";
 
 const HeroSection = () => (
-  <section className="max-w-6xl mx-auto px-4 pt-6">
+  <section className="max-w-6xl mx-auto px-4 pt-6 ">
     <div className="relative overflow-hidden rounded-2xl text-white shadow-xl"
       style={{ background: "linear-gradient(to right, var(--color-secondary), var(--color-primary))" }}>
       {/* Decorative blobs */}
@@ -12,13 +12,13 @@ const HeroSection = () => (
         style={{ background: "rgb(var(--color-accent-rgb) / 0.1)" }} />
 
       <div className="relative z-10 px-6 py-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="text-center md:text-left max-w-lg">
+        <div className="text-center md:text-left max-w-xl">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3"
             style={{ background: "var(--color-accent)", color: "var(--color-accent-text)" }}>
             <Sparkles className="w-3.5 h-3.5" /> Order Food Online
           </span>
-          <h2 className="text-2xl md:text-4xl font-extrabold leading-tight mb-2">
-            Delivering Deliciousness Straight To Your Door
+          <h2 className="text-2xl md:text-[37px] font-extrabold leading-tight font-['Nunito',sans-serif] mb-2">
+            It's time to have a good day with your favorite meals in one place
           </h2>
           <p className="text-sm text-white/80">
             Enjoy hot gourmet burgers, hand-crafted specialty coffee drinks, refreshing fruit smoothies, and decadent fresh chocolate cakes. No login needed!

@@ -1,38 +1,38 @@
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   DYNAMIC BRAND THEME  ─  CSS Custom Properties
-   These defaults are the original "Good Day" palette.
-   The ThemeProvider (context/ThemeContext.jsx) will overwrite them at
-   runtime with values extracted from the companyData API response,
-   making the whole UI automatically match each restaurant's brand.
-   ═══════════════════════════════════════════════════════════════════════════ */
+    DYNAMIC BRAND THEME  ─  CSS Custom Properties
+    These defaults are the original "Good Day" palette.
+    The ThemeProvider (context/ThemeContext.jsx) will overwrite them at
+    runtime with values extracted from the companyData API response,
+    making the whole UI automatically match each restaurant's brand.
+    ═══════════════════════════════════════════════════════════════════════════ */
 :root {
-  /* Primary brand colour – buttons, active states, focus rings */
-  --color-primary:        #5F359F;
-  --color-primary-hover:  #7649FD;
-  --color-primary-text:   #ffffff;   /* text that sits ON primary bg */
-  --color-primary-rgb:    95 53 159; /* r g b without commas for opacity tricks */
+  /* Primary brand colour – Matched to the signature Logo Teal */
+  --color-primary:        #51A19D;
+  --color-primary-hover:  #3D7D7A;   /* A richer, slightly deeper teal for hover states */
+  --color-primary-text:   #ffffff;   /* clean white text on teal backgrounds */
+  --color-primary-rgb:    81 161 157; 
 
-  /* Secondary brand colour – headings, dark fills */
-  --color-secondary:      #003660;
+  /* Secondary brand colour – Matched to the crisp Logo Charcoal Text */
+  --color-secondary:      #222827;   /* Perfect for bold headings and dark card fills */
   --color-secondary-text: #ffffff;
-  --color-secondary-rgb:  0 54 96;
+  --color-secondary-rgb:  34 40 39;
 
-  /* Accent colour – badges, highlight labels */
-  --color-accent:         #FFDF00;
-  --color-accent-text:    #003660;   /* usually dark on yellow */
-  --color-accent-rgb:     255 223 0;
+  /* Accent colour – Matched to the appetizing Logo Lime Green */
+  --color-accent:         #94C15B;   /* Eye-catching badge and highlight color */
+  --color-accent-text:    #222827;   /* Charcoal text for clear readability over green */
+  --color-accent-rgb:     148 193 91;
 
-  /* Page / panel backgrounds */
-  --color-bg:             #FDF8F6;
-  --color-bg-rgb:         253 248 246;
+  /* Page / panel backgrounds – Swapped from warm pink to fresh premium mint-white */
+  --color-bg:             #F5FAF9;   
+  --color-bg-rgb:         245 250 249;
   --color-surface:        #FFFFFF;
 
   /* Utility */
-  --color-border:         #E5E7EB;
-  --color-muted:          #808080;
-  --color-body:           #374151;
+  --color-border:         #E1ECEB;   /* Soft teal-tinted border line */
+  --color-muted:          #708280;   /* Muted gray-teal for secondary text */
+  --color-body:           #3F4948;   /* Dark graphite text instead of harsh pitch black */
   --color-danger:         #dc3545;
   --color-success:        #198754;
 }
@@ -95,4 +95,3 @@ body {
 .leaflet-bottom {
   z-index: 10 !important;
 }
-
