@@ -10,8 +10,9 @@ export default function App() {
     async function fetchCompany() {
       try {
         // Fallback host if testing locally without correct host header
-        // In Vite dev, window.location.host is often localhost:3000
-        const host = "goodday.aisetechnologies.com";
+        const host = window.location.host.includes("localhost")
+          ? "goodday.aisetechnologies.com"
+          : window.location.host;
         const data = await getCompanyFromHost(host);
         setCompanyData(data);
       } catch (error) {

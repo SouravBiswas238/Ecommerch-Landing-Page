@@ -38,8 +38,8 @@ const CheckoutModal = ({
     setOsmProvider(new OpenStreetMapProvider());
   }, []);
 
-  const { deliveryCharge, deliveryChargeLoading, deliveryError } =
-    useDeliveryCharge(companyId, mapLocation, checkoutForm.deliveryType);
+  const { deliveryCharge, deliveryChargeLoading, deliveryError, zone, minimumOrderError } =
+    useDeliveryCharge(companyId, mapLocation, checkoutForm.deliveryType, cartSubtotal);
 
   const deliveryFee = checkoutForm.deliveryType === "delivery" ? deliveryCharge : 0;
   const cartTotal = cartSubtotal + deliveryFee;
@@ -348,8 +348,30 @@ const CheckoutModal = ({
                 </span>
               </div>
             )}
+            {/* Zone badge */}
+            {zone && checkoutForm.deliveryType === "delivery" && (
+              <div className="flex items-center justify-between mt-1">
+                <span>Delivery Zone</span>
+                <span
+                  className="text-[10px] font-extrabold px-2 py-0.5 rounded-full"
+                  style={{
+                    background: zone === "Zone A" ? "#dbeafe" : "#fef3c7",
+                    color: zone === "Zone A" ? "#1d4ed8" : "#b45309",
+                  }}
+                >
+                  📍 {zone}
+                </span>
+              </div>
+            )}
             {deliveryError && (
               <div className="text-[#dc3545] font-bold text-[10px] mt-1 bg-[#dc3545]/10 p-2 rounded-lg">{deliveryError}</div>
+            )}
+            {/* Minimum order error */}
+            {minimumOrderError && (
+              <div className="text-[#dc3545] font-bold text-[10px] mt-1 bg-[#dc3545]/10 p-2 rounded-lg flex items-start gap-1">
+                <span>⚠️</span>
+                <span>{minimumOrderError}</span>
+              </div>
             )}
             <div className="flex justify-between text-[#003660] font-extrabold text-sm pt-1 mt-1 border-t border-[#E5E7EB]">
               <span>Amount to Pay</span>
@@ -358,7 +380,7 @@ const CheckoutModal = ({
           </div>
 
           {/* Submit */}
-          {!deliveryChargeLoading && !deliveryError && (
+          {!deliveryChargeLoading && !deliveryError && !minimumOrderError && (
             <button
               type="submit"
               className="w-full py-3.5 rounded-xl text-xs font-bold transition-all cursor-pointer uppercase tracking-wider"
