@@ -312,8 +312,8 @@ const CheckoutModal = ({
             <label className="text-xs font-extrabold uppercase text-[#003660] block tracking-wide">Payment Method</label>
             <div className="grid grid-cols-2 gap-2">
               {[
-                { key: "cash", icon: <DollarSign className="w-4 h-4" />, label: "Cash" },
-                { key: "card", icon: <CreditCard className="w-4 h-4" />, label: "Card" },
+                { key: "cod", icon: <DollarSign className="w-4 h-4" />, label: "Cash" },
+                { key: "powertranz", icon: <CreditCard className="w-4 h-4" />, label: "Card" },
               ].map((opt) => (
                 <div
                   key={opt.key}

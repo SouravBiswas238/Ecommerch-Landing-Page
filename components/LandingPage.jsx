@@ -52,6 +52,8 @@ const LandingPage = ({ companyData }) => {
   // ── Search & filter ──
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const isLocalhost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+  const baseUrl = isLocalhost ? 'https://dev.aisalesteams.com' : window.location.origin;
 
   // ── Cart (via hook) ──
   const {
@@ -160,7 +162,7 @@ const LandingPage = ({ companyData }) => {
       customer_name: checkoutForm.name,
       phone_number: checkoutForm.phone,
       delivery_type: checkoutForm.deliveryType,
-      payment_method: checkoutForm.paymentMethod === "cash" ? "cod" : checkoutForm.paymentMethod,
+      payment_method: checkoutForm.paymentMethod,
       attributes: {
         pickup_time: checkoutForm.pickupTime || "",
         order_note: checkoutForm.orderNote || "",
@@ -193,7 +195,6 @@ const LandingPage = ({ companyData }) => {
       })),
       company: Number(companyData?.id),
     };
-
     try {
       const orderData = await createOrder(payload);
       const orderTime = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -212,6 +213,10 @@ const LandingPage = ({ companyData }) => {
       };
 
       setPlacedOrderDetails(details);
+      if (orderData?.id && orderData?.payment_method !== 'cod') {
+        window.location.href = `${baseUrl}/ecommerce/checkout/${orderData.id}`;
+        return;
+      }
 
       if (orderData?.uuid) {
         const newOrderObj = {
