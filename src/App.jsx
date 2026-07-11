@@ -26,7 +26,7 @@ const updateFavicon = (companyData) => {
   if (typeof document === "undefined") return;
 
   const faviconUrl =
-    companyData?.attributes?.favicon 
+    companyData?.attributes?.favicon ||
     buildFallbackFavicon(companyData?.name || "Company");
 
   let link = document.querySelector('link[rel="icon"]');

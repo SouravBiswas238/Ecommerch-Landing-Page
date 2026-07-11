@@ -21,6 +21,7 @@ import MobileCartPill from "@/components/landing/MobileCartPill";
 import CartDrawer from "@/components/landing/CartDrawer";
 import OrderSuccessModal from "@/components/landing/OrderSuccessModal";
 import TrackOrderDrawer from "@/components/landing/TrackOrderDrawer";
+import FooterSection from "@/components/landing/FooterSection";
 
 // Product
 import ProductModal from "@/components/product/ProductModal";
@@ -323,7 +324,7 @@ const LandingPage = ({ companyData }) => {
   return (
     <ThemeProvider companyData={companyData}>
       <div
-        className="min-h-screen font-sans antialiased pb-24 md:pb-12"
+        className="min-h-screen font-sans antialiased pb-2"
         style={{ background: "var(--color-bg)", color: "var(--color-body)" }}
       >
         {/* Toasts */}
@@ -512,6 +513,9 @@ const LandingPage = ({ companyData }) => {
             onClose={() => setTrackDrawerOpen(false)}
           />
         )}
+
+        {/* Footer */}
+        <FooterSection companyData={companyData} />
       </div>
     </ThemeProvider>
   );
