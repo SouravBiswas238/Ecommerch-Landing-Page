@@ -1,5 +1,3 @@
-
-
 import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { ThemeProvider } from "@/context/ThemeContext";
 
@@ -9,9 +7,6 @@ import { useToast } from "@/hooks/useToast";
 
 // API
 import { fetchMenu, createOrder } from "@/lib/api";
-
-// Constants
-import FALLBACK_PRODUCTS from "@/constants/fallbackProducts";
 
 // UI Components
 import Header from "@/components/ui/Header";
@@ -41,13 +36,16 @@ const loadOrders = () => {
     if (Array.isArray(stored)) return stored;
     if (stored && stored.uuid) return [stored];
     return [];
-  } catch { return []; }
+  } catch {
+    return [];
+  }
 };
 
 const LandingPage = ({ companyData }) => {
   // ── Products ──
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showSkeletonFallback, setShowSkeletonFallback] = useState(false);
 
   // ── Search & filter ──
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -55,10 +53,15 @@ const LandingPage = ({ companyData }) => {
 
   // ── Cart (via hook) ──
   const {
-    cart, cartSubtotal, cartTotalItems,
-    addToCartDirect, addToCartWithOptions,
-    updateCartItemQuantity, removeCartItem,
-    clearCart, getSimpleProductQty,
+    cart,
+    cartSubtotal,
+    cartTotalItems,
+    addToCartDirect,
+    addToCartWithOptions,
+    updateCartItemQuantity,
+    removeCartItem,
+    clearCart,
+    getSimpleProductQty,
   } = useCart();
 
   // ── Toast (via hook) ──
@@ -79,23 +82,30 @@ const LandingPage = ({ companyData }) => {
 
   // ── Saved orders ──
   const [savedOrders, setSavedOrders] = useState([]);
-  useEffect(() => { setSavedOrders(loadOrders()); }, []);
-  useEffect(() => { if (trackDrawerOpen) setSavedOrders(loadOrders()); }, [trackDrawerOpen]);
+  useEffect(() => {
+    setSavedOrders(loadOrders());
+  }, []);
+  useEffect(() => {
+    if (trackDrawerOpen) setSavedOrders(loadOrders());
+  }, [trackDrawerOpen]);
 
   // ── Fetch products ──
   useEffect(() => {
     const load = async () => {
       try {
         setLoading(true);
+        setShowSkeletonFallback(false);
         const data = await fetchMenu(companyData?.id);
         if (data && Array.isArray(data) && data.length > 0) {
           setProducts(data.filter((p) => p.is_active !== false));
         } else {
-          setProducts(FALLBACK_PRODUCTS);
+          setProducts([]);
+          setShowSkeletonFallback(true);
         }
       } catch (err) {
-        console.error("API error, using fallback products:", err);
-        setProducts(FALLBACK_PRODUCTS);
+        console.error("API error while loading products:", err);
+        setProducts([]);
+        setShowSkeletonFallback(true);
       } finally {
         setLoading(false);
       }
@@ -108,25 +118,75 @@ const LandingPage = ({ companyData }) => {
     if (redirectCountdown > 0) {
       const timer = setTimeout(() => setRedirectCountdown((p) => p - 1), 1000);
       return () => clearTimeout(timer);
-    } else if (redirectCountdown === 0 && orderSuccess && placedOrderDetails?.uuid) {
+    } else if (
+      redirectCountdown === 0 &&
+      orderSuccess &&
+      placedOrderDetails?.uuid
+    ) {
       setOrderSuccess(false);
       setPlacedOrderDetails(null);
     }
   }, [redirectCountdown, orderSuccess, placedOrderDetails]);
 
-  // ── Derived data ──
+  // ── Categories from company data ──
   const categories = useMemo(() => {
-    const list = new Set();
-    products.forEach((p) => { const cat = p.attributes?.category || "Done To Order"; if (cat) list.add(cat); });
-    return ["All", ...Array.from(list)];
-  }, [products]);
+    const companyCategories = companyData?.attributes?.categories;
+
+    if (!Array.isArray(companyCategories)) {
+      return ["All"];
+    }
+
+    const categoriesInsideCombined = new Set();
+
+    companyCategories.forEach((category) => {
+      if (category.includes(" & ")) {
+        category
+          .split(" & ")
+          .map((item) => item.trim())
+          .forEach((item) => categoriesInsideCombined.add(item));
+      }
+    });
+
+    const filteredCategories = companyCategories.filter((category) => {
+      // Keep combined category
+      if (category.includes(" & ")) {
+        return true;
+      }
+
+      // Remove standalone category if it is already
+      // included inside a combined category
+      return !categoriesInsideCombined.has(category);
+    });
+
+    return ["All", ...filteredCategories];
+  }, [companyData]);
 
   const filteredProducts = useMemo(() => {
-    return products.filter((p) => {
-      const matchesCategory = selectedCategory === "All" || p.attributes?.category === selectedCategory;
+    return products.filter((product) => {
+      const productCategory = product.attributes?.category;
+
+      let matchesCategory = false;
+
+      if (selectedCategory === "All") {
+        matchesCategory = true;
+      } else if (selectedCategory.includes(" & ")) {
+        const combinedCategories = selectedCategory
+          .split(" & ")
+          .map((category) => category.trim());
+
+        matchesCategory =
+          combinedCategories.includes(productCategory) ||
+          productCategory === selectedCategory;
+      } else {
+        matchesCategory = productCategory === selectedCategory;
+      }
+
+      const query = searchQuery.toLowerCase();
+
       const matchesSearch =
-        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (p.description && p.description.toLowerCase().includes(searchQuery.toLowerCase()));
+        product.name?.toLowerCase().includes(query) ||
+        product.description?.toLowerCase().includes(query);
+
       return matchesCategory && matchesSearch;
     });
   }, [products, selectedCategory, searchQuery]);
@@ -141,7 +201,9 @@ const LandingPage = ({ companyData }) => {
 
   const handleAddWithOptions = (product, quantity, selectedOptions) => {
     addToCartWithOptions(product, quantity, selectedOptions);
-    showToast(`${quantity > 1 ? quantity + "x " : ""}${product.name} added to cart!`);
+    showToast(
+      `${quantity > 1 ? quantity + "x " : ""}${product.name} added to cart!`,
+    );
   };
 
   const handleRemove = (customKey, name) => {
@@ -155,24 +217,39 @@ const LandingPage = ({ companyData }) => {
   };
 
   // ── Checkout submit ──
-  const handleCheckoutSubmit = async (checkoutForm, mapLocation, cartTotalWithFee, subtotal, deliveryFee) => {
+  const handleCheckoutSubmit = async (
+    checkoutForm,
+    mapLocation,
+    cartTotalWithFee,
+    subtotal,
+    deliveryFee,
+  ) => {
     const payload = {
       customer_name: checkoutForm.name,
       phone_number: checkoutForm.phone,
       delivery_type: checkoutForm.deliveryType,
-      payment_method: checkoutForm.paymentMethod === "cash" ? "cod" : checkoutForm.paymentMethod,
+      payment_method:
+        checkoutForm.paymentMethod === "cash"
+          ? "cod"
+          : checkoutForm.paymentMethod,
       attributes: {
         pickup_time: checkoutForm.pickupTime || "",
         order_note: checkoutForm.orderNote || "",
         branch: "montego_bay",
         ...(mapLocation && {
-          destinition_location_info: { lat: mapLocation.lat, lng: mapLocation.lng },
+          destinition_location_info: {
+            lat: mapLocation.lat,
+            lng: mapLocation.lng,
+          },
         }),
       },
       ...(checkoutForm.deliveryType === "delivery" && {
         shipping_address: checkoutForm.address,
         ...(mapLocation && {
-          destinition_location_info: { lat: mapLocation.lat, lng: mapLocation.lng },
+          destinition_location_info: {
+            lat: mapLocation.lat,
+            lng: mapLocation.lng,
+          },
         }),
       }),
       products: cart.map((item) => ({
@@ -188,7 +265,7 @@ const LandingPage = ({ companyData }) => {
               quantity: mod.quantity ?? 1,
               fixed_quantity: mod.fixed_quantity ?? false,
             })),
-          ])
+          ]),
         ),
       })),
       company: Number(companyData?.id),
@@ -196,10 +273,15 @@ const LandingPage = ({ companyData }) => {
 
     try {
       const orderData = await createOrder(payload);
-      const orderTime = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      const orderTime = new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
 
       const details = {
-        orderNumber: orderData.id ? `GD-${orderData.id}` : "GD-" + Math.floor(100000 + Math.random() * 900000),
+        orderNumber: orderData.id
+          ? `GD-${orderData.id}`
+          : "GD-" + Math.floor(100000 + Math.random() * 900000),
         time: orderTime,
         items: [...cart],
         deliveryAddress: checkoutForm.address,
@@ -240,152 +322,197 @@ const LandingPage = ({ companyData }) => {
 
   return (
     <ThemeProvider companyData={companyData}>
-    <div className="min-h-screen font-sans antialiased pb-24 md:pb-12" style={{ background: "var(--color-bg)", color: "var(--color-body)" }}>
-      {/* Toasts */}
-      <ToastHub toasts={toasts} />
+      <div
+        className="min-h-screen font-sans antialiased pb-24 md:pb-12"
+        style={{ background: "var(--color-bg)", color: "var(--color-body)" }}
+      >
+        {/* Toasts */}
+        <ToastHub toasts={toasts} />
 
-      {/* Header */}
-      <Header
-        companyData={companyData}
-        cartTotalItems={cartTotalItems}
-        cartSubtotal={cartSubtotal}
-        onCartOpen={() => setCartOpen(true)}
-        onTrackOpen={() => setTrackDrawerOpen(true)}
-        hasSavedOrders={savedOrders.length > 0}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-      />
+        {/* Header */}
+        <Header
+          companyData={companyData}
+          cartTotalItems={cartTotalItems}
+          cartSubtotal={cartSubtotal}
+          onCartOpen={() => setCartOpen(true)}
+          onTrackOpen={() => setTrackDrawerOpen(true)}
+          hasSavedOrders={savedOrders.length > 0}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+        />
 
-      {/* Hero */}
-      <HeroSection />
+        {/* Hero */}
+        <HeroSection companyId={companyData?.id} />
 
-      {/* Mobile Search */}
-      <div className="md:hidden px-4 pt-4">
-        <div className="relative flex items-center">
-          <svg className="w-5 h-5 absolute left-4 pointer-events-none" style={{ color: "var(--color-muted)" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
-          </svg>
-          <input
-            type="text"
-            placeholder="Search our delicious foods..."
-            className="w-full bg-[#f9f9f9] rounded-2xl pl-12 pr-4 py-3 text-sm focus:outline-none shadow-sm transition-all"
-            style={{ border: "1px solid var(--color-border)" }}
-            onFocus={e => { e.target.style.borderColor = "var(--color-primary)"; e.target.style.boxShadow = "0 0 0 1px var(--color-primary)"; }}
-            onBlur={e => { e.target.style.borderColor = "var(--color-border)"; e.target.style.boxShadow = "0 1px 2px rgba(0,0,0,0.05)"; }}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-        {/* Left: Menu */}
-        <section className="lg:col-span-2 space-y-6">
-          <CategoryFilter
-            categories={categories}
-            selectedCategory={selectedCategory}
-            onSelect={setSelectedCategory}
-          />
-
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-extrabold" style={{ color: "var(--color-secondary)" }}>
-                {selectedCategory === "All" ? "Signature Menu" : selectedCategory}
-                <span className="text-sm font-medium ml-2" style={{ color: "var(--color-muted)" }}>
-                  ({filteredProducts?.length} {filteredProducts?.length === 1 ? "item" : "items"})
-                </span>
-              </h2>
-            </div>
-            <ProductGrid
-              filteredProducts={filteredProducts}
-              loading={loading}
-              searchQuery={searchQuery}
-              selectedCategory={selectedCategory}
-              onProductClick={setSelectedProduct}
-              onAddDirect={handleAddDirect}
-              onUpdateQty={updateCartItemQuantity}
-              getSimpleProductQty={getSimpleProductQty}
-              onResetFilters={() => { setSelectedCategory("All"); setSearchQuery(""); }}
+        {/* Mobile Search */}
+        <div className="md:hidden px-4 pt-4">
+          <div className="relative flex items-center">
+            <svg
+              className="w-5 h-5 absolute left-4 pointer-events-none"
+              style={{ color: "var(--color-muted)" }}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"
+              />
+            </svg>
+            <input
+              type="text"
+              placeholder="Search our delicious foods..."
+              className="w-full bg-[#f9f9f9] rounded-2xl pl-12 pr-4 py-3 text-sm focus:outline-none shadow-sm transition-all"
+              style={{ border: "1px solid var(--color-border)" }}
+              onFocus={(e) => {
+                e.target.style.borderColor = "var(--color-primary)";
+                e.target.style.boxShadow = "0 0 0 1px var(--color-primary)";
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = "var(--color-border)";
+                e.target.style.boxShadow = "0 1px 2px rgba(0,0,0,0.05)";
+              }}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-        </section>
+        </div>
 
-        {/* Right: Desktop Cart */}
-        <section className="hidden lg:block lg:col-span-1">
-          <CartSidePanel
-            cart={cart}
+        {/* Main Content */}
+        <main className="max-w-6xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left: Menu */}
+          <section className="lg:col-span-2 space-y-6">
+            <CategoryFilter
+              categories={categories}
+              selectedCategory={selectedCategory}
+              onSelect={setSelectedCategory}
+            />
+
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h2
+                  className="text-xl font-extrabold"
+                  style={{ color: "var(--color-secondary)" }}
+                >
+                  {selectedCategory === "All"
+                    ? "Signature Menu"
+                    : selectedCategory}
+                  <span
+                    className="text-sm font-medium ml-2"
+                    style={{ color: "var(--color-muted)" }}
+                  >
+                    ({filteredProducts?.length}{" "}
+                    {filteredProducts?.length === 1 ? "item" : "items"})
+                  </span>
+                </h2>
+              </div>
+              <ProductGrid
+                filteredProducts={filteredProducts}
+                loading={loading}
+                showSkeletonFallback={showSkeletonFallback}
+                searchQuery={searchQuery}
+                selectedCategory={selectedCategory}
+                onProductClick={setSelectedProduct}
+                onAddDirect={handleAddDirect}
+                onUpdateQty={updateCartItemQuantity}
+                getSimpleProductQty={getSimpleProductQty}
+                onResetFilters={() => {
+                  setSelectedCategory("All");
+                  setSearchQuery("");
+                }}
+              />
+            </div>
+          </section>
+
+          {/* Right: Desktop Cart */}
+          <section className="hidden lg:block lg:col-span-1">
+            <CartSidePanel
+              cart={cart}
+              cartTotalItems={cartTotalItems}
+              cartSubtotal={cartSubtotal}
+              cartTotal={cartTotal}
+              onUpdateQty={updateCartItemQuantity}
+              onRemove={handleRemove}
+              onClear={handleClear}
+              onCheckout={() => setCheckoutOpen(true)}
+            />
+          </section>
+        </main>
+
+        {/* Mobile Floating Cart Pill */}
+        {!cartOpen && (
+          <MobileCartPill
             cartTotalItems={cartTotalItems}
             cartSubtotal={cartSubtotal}
+            onOpen={() => setCartOpen(true)}
+          />
+        )}
+
+        {/* Product Modal */}
+        <ProductModal
+          product={selectedProduct}
+          onClose={() => setSelectedProduct(null)}
+          onAddToCart={handleAddWithOptions}
+          currentCartQty={
+            selectedProduct ? getSimpleProductQty(selectedProduct.id) : 0
+          }
+          onQtyChange={(delta) =>
+            selectedProduct && updateCartItemQuantity(selectedProduct.id, delta)
+          }
+        />
+
+        {/* Mobile Cart Drawer */}
+        {cartOpen && (
+          <CartDrawer
+            cart={cart}
+            cartSubtotal={cartSubtotal}
             cartTotal={cartTotal}
+            onClose={() => setCartOpen(false)}
             onUpdateQty={updateCartItemQuantity}
             onRemove={handleRemove}
             onClear={handleClear}
-            onCheckout={() => setCheckoutOpen(true)}
+            onCheckout={() => {
+              setCartOpen(false);
+              setCheckoutOpen(true);
+            }}
           />
-        </section>
-      </main>
+        )}
 
-      {/* Mobile Floating Cart Pill */}
-      {!cartOpen && (
-        <MobileCartPill
-          cartTotalItems={cartTotalItems}
-          cartSubtotal={cartSubtotal}
-          onOpen={() => setCartOpen(true)}
+        {/* Checkout Modal */}
+        {checkoutOpen && (
+          <CheckoutModal
+            companyId={companyData?.id}
+            cart={cart}
+            cartSubtotal={cartSubtotal}
+            onClose={() => setCheckoutOpen(false)}
+            onSubmit={handleCheckoutSubmit}
+          />
+        )}
+
+        {/* Order Success Modal */}
+        <OrderSuccessModal
+          orderDetails={placedOrderDetails}
+          redirectCountdown={redirectCountdown}
+          onTrackOrder={() => {
+            setOrderSuccess(false);
+            setTrackDrawerOpen(true);
+          }}
+          onBackToMenu={() => {
+            setOrderSuccess(false);
+            setPlacedOrderDetails(null);
+          }}
         />
-      )}
 
-      {/* Product Modal */}
-      <ProductModal
-        product={selectedProduct}
-        onClose={() => setSelectedProduct(null)}
-        onAddToCart={handleAddWithOptions}
-        currentCartQty={selectedProduct ? getSimpleProductQty(selectedProduct.id) : 0}
-        onQtyChange={(delta) => selectedProduct && updateCartItemQuantity(selectedProduct.id, delta)}
-      />
-
-      {/* Mobile Cart Drawer */}
-      {cartOpen && (
-        <CartDrawer
-          cart={cart}
-          cartSubtotal={cartSubtotal}
-          cartTotal={cartTotal}
-          onClose={() => setCartOpen(false)}
-          onUpdateQty={updateCartItemQuantity}
-          onRemove={handleRemove}
-          onClear={handleClear}
-          onCheckout={() => { setCartOpen(false); setCheckoutOpen(true); }}
-        />
-      )}
-
-      {/* Checkout Modal */}
-      {checkoutOpen && (
-        <CheckoutModal
-          companyId={companyData?.id}
-          cart={cart}
-          cartSubtotal={cartSubtotal}
-          onClose={() => setCheckoutOpen(false)}
-          onSubmit={handleCheckoutSubmit}
-        />
-      )}
-
-      {/* Order Success Modal */}
-      <OrderSuccessModal
-        orderDetails={placedOrderDetails}
-        redirectCountdown={redirectCountdown}
-        onTrackOrder={() => { setOrderSuccess(false); setTrackDrawerOpen(true); }}
-        onBackToMenu={() => { setOrderSuccess(false); setPlacedOrderDetails(null); }}
-      />
-
-      {/* Track Order Drawer */}
-      {trackDrawerOpen && (
-        <TrackOrderDrawer
-          savedOrders={savedOrders}
-          onClose={() => setTrackDrawerOpen(false)}
-        />
-      )}
-    </div>
+        {/* Track Order Drawer */}
+        {trackDrawerOpen && (
+          <TrackOrderDrawer
+            savedOrders={savedOrders}
+            onClose={() => setTrackDrawerOpen(false)}
+          />
+        )}
+      </div>
     </ThemeProvider>
   );
 };
