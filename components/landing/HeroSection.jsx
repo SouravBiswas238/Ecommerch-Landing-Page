@@ -103,7 +103,7 @@ const HeroSection = ({ companyId }) => {
               >
                 <img
                   src={
-                    currentProduct.product_image ||
+                    currentProduct.image_url ||
                     currentProduct.image ||
                     "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150&auto=format&fit=crop&q=80"
                   }
