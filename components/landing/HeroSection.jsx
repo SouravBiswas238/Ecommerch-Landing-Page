@@ -77,15 +77,9 @@ const HeroSection = ({ companyId, onProductClick }) => {
               Order Food Online
             </span>
 
-            <h2 className="text-2xl md:text-[37px] font-extrabold leading-tight font-['Nunito',sans-serif] mb-2">
+            <h2 className="text-2xl md:text-[40px] font-extrabold leading-tight font-['Nunito',sans-serif] mb-2">
               It's time to have a good day with your favorite meals in one place
             </h2>
-
-            <p className="text-sm text-white/80">
-              Enjoy hot gourmet burgers, hand-crafted specialty coffee drinks,
-              refreshing fruit smoothies, and decadent fresh chocolate cakes. No
-              login needed!
-            </p>
           </div>
 
           {/* Top selling product slider */}
