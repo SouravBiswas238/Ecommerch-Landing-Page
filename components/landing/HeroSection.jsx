@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Sparkles } from "lucide-react";
 import { fetchTopOrderedProducts } from "@/lib/api";
 
-const HeroSection = ({ companyId }) => {
+const HeroSection = ({ companyId, onProductClick }) => {
   const [topSellingProducts, setTopSellingProducts] = useState([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -36,7 +36,7 @@ const HeroSection = ({ companyId }) => {
 
     const interval = setInterval(() => {
       setCurrentSlide((prev) =>
-        prev === topSellingProducts.length - 1 ? 0 : prev + 1
+        prev === topSellingProducts.length - 1 ? 0 : prev + 1,
       );
     }, 3000);
 
@@ -83,8 +83,8 @@ const HeroSection = ({ companyId }) => {
 
             <p className="text-sm text-white/80">
               Enjoy hot gourmet burgers, hand-crafted specialty coffee drinks,
-              refreshing fruit smoothies, and decadent fresh chocolate cakes.
-              No login needed!
+              refreshing fruit smoothies, and decadent fresh chocolate cakes. No
+              login needed!
             </p>
           </div>
 
@@ -97,9 +97,11 @@ const HeroSection = ({ companyId }) => {
                 </p>
               </div>
             ) : currentProduct ? (
-              <div
+              <button
                 key={currentProduct.product_id}
-                className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 shadow-lg flex gap-3 min-w-[280px] max-w-[340px] transition-all duration-500"
+                type="button"
+                onClick={() => onProductClick?.(currentProduct)}
+                className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 shadow-lg flex gap-3 min-w-70 max-w-85 transition-all duration-500 cursor-pointer text-left hover:bg-white/15 hover:border-white/30"
               >
                 <img
                   src={
@@ -128,12 +130,8 @@ const HeroSection = ({ companyId }) => {
                       ${currentProduct.price}
                     </p>
                   )}
-
-                  <p className="text-xs text-white/70 mt-1">
-                    {currentProduct.total_quantity} sold
-                  </p>
                 </div>
-              </div>
+              </button>
             ) : null}
           </div>
         </div>
