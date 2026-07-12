@@ -76,6 +76,34 @@ const LandingPage = ({ companyData }) => {
   // ── Product modal ──
   const [selectedProduct, setSelectedProduct] = useState(null);
 
+  const resolveTopSellingProduct = (topSellingProduct) => {
+    if (!topSellingProduct) return null;
+
+    const matchedProduct = products.find(
+      (product) => String(product.id) === String(topSellingProduct.product_id),
+    );
+
+    if (matchedProduct) {
+      return matchedProduct;
+    }
+
+    return {
+      id: topSellingProduct.product_id ?? topSellingProduct.id,
+      name: topSellingProduct.product_name || "Top selling product",
+      price: Number(topSellingProduct.price ?? 0),
+      description: topSellingProduct.description || "",
+      cover_photo: topSellingProduct.image_url || topSellingProduct.image || "",
+      images: [
+        ...(topSellingProduct.image_url ? [topSellingProduct.image_url] : []),
+        ...(topSellingProduct.image ? [topSellingProduct.image] : []),
+      ],
+      attributes: {
+        category: "Top Selling",
+      },
+      options: {},
+    };
+  };
+
   // ── Order success ──
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [placedOrderDetails, setPlacedOrderDetails] = useState(null);
@@ -343,7 +371,12 @@ const LandingPage = ({ companyData }) => {
         />
 
         {/* Hero */}
-        <HeroSection companyId={companyData?.id} />
+        <HeroSection
+          companyId={companyData?.id}
+          onProductClick={(topSellingProduct) =>
+            setSelectedProduct(resolveTopSellingProduct(topSellingProduct))
+          }
+        />
 
         {/* Mobile Search */}
         <div className="md:hidden px-4 pt-4">
