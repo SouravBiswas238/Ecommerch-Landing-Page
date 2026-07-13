@@ -6,6 +6,7 @@ const HeroSection = ({ companyId, onProductClick }) => {
   const [topSellingProducts, setTopSellingProducts] = useState([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [imageFailed, setImageFailed] = useState(false);
 
   useEffect(() => {
     const getTopOrderedProducts = async () => {
@@ -44,6 +45,18 @@ const HeroSection = ({ companyId, onProductClick }) => {
   }, [topSellingProducts.length]);
 
   const currentProduct = topSellingProducts[currentSlide];
+  const currentProductImage =
+    typeof currentProduct?.image_url === "string" &&
+    currentProduct.image_url.trim() !== ""
+      ? currentProduct.image_url
+      : typeof currentProduct?.image === "string" &&
+          currentProduct.image.trim() !== ""
+        ? currentProduct.image
+        : null;
+
+  useEffect(() => {
+    setImageFailed(false);
+  }, [currentSlide, currentProduct?.image_url, currentProduct?.image]);
 
   return (
     <section className="max-w-6xl mx-auto px-4 pt-6">
@@ -97,15 +110,20 @@ const HeroSection = ({ companyId, onProductClick }) => {
                 onClick={() => onProductClick?.(currentProduct)}
                 className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 shadow-lg flex gap-3 min-w-70 max-w-85 transition-all duration-500 cursor-pointer text-left hover:bg-white/15 hover:border-white/30"
               >
-                <img
-                  src={
-                    currentProduct.image_url ||
-                    currentProduct.image ||
-                    "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150&auto=format&fit=crop&q=80"
-                  }
-                  alt={currentProduct.product_name}
-                  className="w-16 h-16 rounded-xl object-cover shrink-0"
-                />
+                {currentProductImage && !imageFailed ? (
+                  <img
+                    src={currentProductImage}
+                    alt={currentProduct.product_name}
+                    className="w-16 h-16 rounded-xl object-cover shrink-0"
+                    onError={() => setImageFailed(true)}
+                  />
+                ) : (
+                  <div
+                    className="w-16 h-16 rounded-xl shrink-0 animate-pulse"
+                    style={{ background: "rgb(255 255 255 / 0.14)" }}
+                    aria-hidden="true"
+                  />
+                )}
 
                 <div className="min-w-0">
                   <h4
