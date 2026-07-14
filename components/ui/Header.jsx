@@ -41,6 +41,7 @@ const Header = ({
               src={brandLogo}
               alt={brandName}
               className="w-full h-full object-cover rounded-xl"
+              loading="lazy"
             />
           </div>
 

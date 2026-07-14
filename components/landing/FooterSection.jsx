@@ -32,6 +32,7 @@ const FooterSection = ({ companyData }) => {
                     src={brandLogo}
                     alt={brandName}
                     className="h-full w-full object-cover"
+                    loading="lazy"
                   />
                 ) : (
                   <Building2 size={24} className="text-[#3F9C9F]" />

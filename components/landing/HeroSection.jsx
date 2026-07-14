@@ -39,7 +39,7 @@ const HeroSection = ({ companyId, onProductClick }) => {
       setCurrentSlide((prev) =>
         prev === topSellingProducts.length - 1 ? 0 : prev + 1,
       );
-    }, 3000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, [topSellingProducts.length]);
@@ -115,6 +115,7 @@ const HeroSection = ({ companyId, onProductClick }) => {
                     src={currentProductImage}
                     alt={currentProduct.product_name}
                     className="w-16 h-16 rounded-xl object-cover shrink-0"
+                    loading="lazy"
                     onError={() => setImageFailed(true)}
                   />
                 ) : (
@@ -130,7 +131,7 @@ const HeroSection = ({ companyId, onProductClick }) => {
                     className="text-sm font-bold uppercase tracking-wide"
                     style={{ color: "var(--color-accent)" }}
                   >
-                    Top Selling
+                    Most Popular Item
                   </h4>
 
                   <p className="text-sm font-bold text-white line-clamp-2">
