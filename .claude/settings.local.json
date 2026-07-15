@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /Users/sourav12/Office/Aise/Restaurant_Landing ls-files)",
+      "Bash(git -C /Users/sourav12/Office/Aise/Restaurant_Landing status --short)",
+      "Bash(git -C /Users/sourav12/Office/Aise/Restaurant_Landing rm -r --cached dist)"
+    ]
+  }
+}
