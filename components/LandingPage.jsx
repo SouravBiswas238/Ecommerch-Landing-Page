@@ -3,6 +3,7 @@ import { ThemeProvider } from "@/context/ThemeContext";
 
 // Hooks
 import { useCart } from "@/hooks/useCart";
+import { useBusinessHours } from "@/hooks/useBusinessHours";
 import { useToast } from "@/hooks/useToast";
 
 // API
@@ -67,6 +68,7 @@ const LandingPage = ({ companyData }) => {
 
   // ── Toast (via hook) ──
   const { toasts, showToast } = useToast();
+  const { validateBusinessHours } = useBusinessHours(companyData);
 
   // ── UI visibility ──
   const [cartOpen, setCartOpen] = useState(false);
@@ -75,6 +77,17 @@ const LandingPage = ({ companyData }) => {
 
   // ── Product modal ──
   const [selectedProduct, setSelectedProduct] = useState(null);
+
+  const handleCheckoutRequest = () => {
+    const { allowed, message } = validateBusinessHours();
+
+    if (!allowed) {
+      showToast(message, "warning");
+      return false;
+    }
+
+    return true;
+  };
 
   const resolveTopSellingProduct = (topSellingProduct) => {
     if (!topSellingProduct) return null;
@@ -470,7 +483,10 @@ const LandingPage = ({ companyData }) => {
               onUpdateQty={updateCartItemQuantity}
               onRemove={handleRemove}
               onClear={handleClear}
-              onCheckout={() => setCheckoutOpen(true)}
+              onCheckout={() => {
+                if (!handleCheckoutRequest()) return;
+                setCheckoutOpen(true);
+              }}
             />
           </section>
         </main>
@@ -508,6 +524,7 @@ const LandingPage = ({ companyData }) => {
             onRemove={handleRemove}
             onClear={handleClear}
             onCheckout={() => {
+              if (!handleCheckoutRequest()) return;
               setCartOpen(false);
               setCheckoutOpen(true);
             }}
@@ -522,6 +539,7 @@ const LandingPage = ({ companyData }) => {
             cartSubtotal={cartSubtotal}
             onClose={() => setCheckoutOpen(false)}
             onSubmit={handleCheckoutSubmit}
+             onValidateBusinessHours={handleCheckoutRequest}
           />
         )}
 
