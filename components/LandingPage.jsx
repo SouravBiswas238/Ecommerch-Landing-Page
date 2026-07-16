@@ -7,7 +7,7 @@ import { useBusinessHours } from "@/hooks/useBusinessHours";
 import { useToast } from "@/hooks/useToast";
 
 // API
-import { fetchMenu, createOrder } from "@/lib/api";
+import { fetchMenu, createOrder, fetchCompanyOpenSettings } from "@/lib/api";
 
 // UI Components
 import Header from "@/components/ui/Header";
@@ -65,10 +65,14 @@ const LandingPage = ({ companyData }) => {
     clearCart,
     getSimpleProductQty,
   } = useCart();
+  const [businessHourSettings, setBusinessHourSettings] = useState([]);
 
   // ── Toast (via hook) ──
   const { toasts, showToast } = useToast();
-  const { validateBusinessHours } = useBusinessHours(companyData);
+  const { validateBusinessHours } = useBusinessHours(
+    companyData,
+    businessHourSettings,
+  );
 
   // ── UI visibility ──
   const [cartOpen, setCartOpen] = useState(false);
@@ -137,23 +141,54 @@ const LandingPage = ({ companyData }) => {
       try {
         setLoading(true);
         setShowSkeletonFallback(false);
+
         const data = await fetchMenu(companyData?.id);
-        if (data && Array.isArray(data) && data.length > 0) {
-          setProducts(data.filter((p) => p.is_active !== false));
+
+        if (Array.isArray(data) && data.length > 0) {
+          setProducts(data.filter((product) => product.is_active !== false));
         } else {
           setProducts([]);
           setShowSkeletonFallback(true);
         }
-      } catch (err) {
-        console.error("API error while loading products:", err);
+      } catch (error) {
+        console.error("API error while loading products:", error);
+
         setProducts([]);
         setShowSkeletonFallback(true);
       } finally {
         setLoading(false);
       }
     };
-    load();
-  }, []);
+
+    if (companyData?.id) {
+      load();
+    }
+  }, [companyData?.id]);
+
+  useEffect(() => {
+    const loadBusinessHours = async () => {
+      if (!companyData?.id) {
+        setBusinessHourSettings([]);
+        return;
+      }
+
+      try {
+        const settings = await fetchCompanyOpenSettings(companyData.id);
+        console.log("Fetched business hours settings:----------", settings);
+
+        setBusinessHourSettings(settings);
+      } catch (error) {
+        console.error("API error while loading business hours:", error);
+
+        setBusinessHourSettings([]);
+      }
+    };
+
+    loadBusinessHours();
+  }, [companyData?.id]);
+
+  console.log("Business Hour Settings:", businessHourSettings);
+
 
   // ── Redirect countdown ──
   useEffect(() => {
@@ -318,7 +353,6 @@ const LandingPage = ({ companyData }) => {
       })),
       company: Number(companyData?.id),
     };
-
 
     try {
       const orderData = await createOrder(payload);

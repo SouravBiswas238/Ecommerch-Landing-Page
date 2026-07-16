@@ -8,21 +8,14 @@ const parseTimeToMinutes = (timeString) => {
   const normalizedTime = timeString.trim().toLowerCase();
 
   // Supports: "7:30am", "7:30 am", "5:00pm"
-  const twelveHourMatch = normalizedTime.match(
-    /^(\d{1,2}):(\d{2})\s*(am|pm)$/,
-  );
+  const twelveHourMatch = normalizedTime.match(/^(\d{1,2}):(\d{2})\s*(am|pm)$/);
 
   if (twelveHourMatch) {
     let hours = Number(twelveHourMatch[1]);
     const minutes = Number(twelveHourMatch[2]);
     const period = twelveHourMatch[3];
 
-    if (
-      hours < 1 ||
-      hours > 12 ||
-      minutes < 0 ||
-      minutes > 59
-    ) {
+    if (hours < 1 || hours > 12 || minutes < 0 || minutes > 59) {
       return null;
     }
 
@@ -37,7 +30,7 @@ const parseTimeToMinutes = (timeString) => {
     return hours * 60 + minutes;
   }
 
-  // Also supports: "07:30", "17:00", "17:00:00"
+  // Supports: "07:30", "17:00", "17:00:00"
   const twentyFourHourMatch = normalizedTime.match(
     /^(\d{1,2}):(\d{2})(?::\d{2})?$/,
   );
@@ -46,12 +39,7 @@ const parseTimeToMinutes = (timeString) => {
     const hours = Number(twentyFourHourMatch[1]);
     const minutes = Number(twentyFourHourMatch[2]);
 
-    if (
-      hours < 0 ||
-      hours > 23 ||
-      minutes < 0 ||
-      minutes > 59
-    ) {
+    if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
       return null;
     }
 
@@ -77,128 +65,179 @@ const formatTimeLabel = (timeString) => {
   return `${hours12}:${String(minutes).padStart(2, "0")} ${period}`;
 };
 
-const getCurrentMinutesInTimeZone = (timeZone) => {
-  if (!timeZone) {
-    return null;
-  }
-
+const getCurrentDateTimeInTimeZone = (timeZone) => {
   try {
     const parts = new Intl.DateTimeFormat("en-US", {
       timeZone,
+      weekday: "long",
       hour: "2-digit",
       minute: "2-digit",
       hourCycle: "h23",
     }).formatToParts(new Date());
-    
+
+    const weekdayPart = parts.find((part) => part.type === "weekday");
 
     const hourPart = parts.find((part) => part.type === "hour");
+
     const minutePart = parts.find((part) => part.type === "minute");
 
     const hours = Number(hourPart?.value);
     const minutes = Number(minutePart?.value);
 
-    if (Number.isNaN(hours) || Number.isNaN(minutes)) {
+    if (!weekdayPart?.value || Number.isNaN(hours) || Number.isNaN(minutes)) {
       return null;
     }
 
-    return hours * 60 + minutes;
+    return {
+      currentDay: weekdayPart.value.toLowerCase(),
+      currentMinutes: hours * 60 + minutes,
+    };
   } catch (error) {
-    console.error("Invalid company timezone:", timeZone, error);
+    console.error("Invalid timezone:", timeZone, error);
     return null;
   }
 };
 
-export const useBusinessHours = (companyData) => {
-  /*
-   * Expected structure:
-   *
-   * companyData.timezone = "America/Jamaica"
-   *
-   * companyData.attributes.business_hours = {
-   *   opening: "7:30am",
-   *   closing: "5:00pm"
-   * }
-   */
+const checkScheduleIsOpen = (schedule, currentMinutes) => {
+  if (schedule?.full_day_close === true) {
+    return false;
+  }
 
-  const businessHours =
-    companyData?.attributes?.business_hours;
+  const openingMinutes = parseTimeToMinutes(schedule?.start_time);
 
-  const openingTime = businessHours?.opening;
-  const closingTime = businessHours?.closing;
-  const companyTimeZone = companyData?.timezone;
+  const closingMinutes = parseTimeToMinutes(schedule?.end_time);
 
-  const openingMinutes = useMemo(
-    () => parseTimeToMinutes(openingTime),
-    [openingTime],
+  if (openingMinutes === null || closingMinutes === null) {
+    return null;
+  }
+
+  // Same start and end time means open 24 hours.
+  if (openingMinutes === closingMinutes) {
+    return true;
+  }
+
+  // Normal schedule: 7:30 AM to 5:00 PM
+  if (openingMinutes < closingMinutes) {
+    return currentMinutes >= openingMinutes && currentMinutes < closingMinutes;
+  }
+
+  // Overnight schedule: 6:00 PM to 2:00 AM
+  return currentMinutes >= openingMinutes || currentMinutes < closingMinutes;
+};
+
+const createBusinessHoursLabel = (settings) => {
+  const labels = settings
+    .filter((setting) => setting?.full_day_close !== true)
+    .map((setting) => {
+      const openingLabel = formatTimeLabel(setting?.start_time);
+
+      const closingLabel = formatTimeLabel(setting?.end_time);
+
+      if (!openingLabel || !closingLabel) {
+        return null;
+      }
+
+      return `${openingLabel} to ${closingLabel}`;
+    })
+    .filter(Boolean);
+
+  // Remove duplicate time labels.
+  return [...new Set(labels)].join(" or ");
+};
+
+const getLatestCloseMessage = (settings) => {
+  const sortedSettings = [...settings].sort((first, second) => {
+    const firstDate = new Date(
+      first?.updated_at || first?.created_at || 0,
+    ).getTime();
+
+    const secondDate = new Date(
+      second?.updated_at || second?.created_at || 0,
+    ).getTime();
+
+    return secondDate - firstDate;
+  });
+
+  return (
+    sortedSettings.find((setting) => setting?.close_hour_bot_message)
+      ?.close_hour_bot_message || ""
   );
+};
 
-  const closingMinutes = useMemo(
-    () => parseTimeToMinutes(closingTime),
-    [closingTime],
-  );
+export const useBusinessHours = (companyData, openSettings = []) => {
+  // Use the company timezone when available.
+  // Otherwise default to Jamaica.
+  const companyTimeZone = companyData?.timezone || "America/Jamaica";
 
-  const businessHoursLabel = useMemo(() => {
-    const openingLabel = formatTimeLabel(openingTime);
-    const closingLabel = formatTimeLabel(closingTime);
+  const getTodayBusinessHours = useCallback(() => {
+    const currentDateTime = getCurrentDateTimeInTimeZone(companyTimeZone);
 
-    if (!openingLabel || !closingLabel) {
-      return "";
+    if (!currentDateTime) {
+      return {
+        currentDay: "",
+        currentMinutes: null,
+        settings: [],
+      };
     }
 
-    return `${openingLabel} to ${closingLabel}`;
-  }, [openingTime, closingTime]);
+    const todaySettings = openSettings.filter(
+      (setting) =>
+        setting?.is_active !== false &&
+        String(setting?.open_day || "").toLowerCase() ===
+          currentDateTime.currentDay,
+    );
+
+    return {
+      currentDay: currentDateTime.currentDay,
+      currentMinutes: currentDateTime.currentMinutes,
+      settings: todaySettings,
+    };
+  }, [companyTimeZone, openSettings]);
+
+  const currentBusinessHours = useMemo(
+    () => getTodayBusinessHours(),
+    [getTodayBusinessHours],
+  );
+
+  const businessHoursLabel = useMemo(
+    () => createBusinessHoursLabel(currentBusinessHours.settings),
+    [currentBusinessHours.settings],
+  );
 
   const checkIsOpenNow = useCallback(() => {
+    const { currentMinutes, settings: todaySettings } = getTodayBusinessHours();
+
     /*
-     * Do not block ordering when business-hour
-     * configuration is missing or invalid.
+     * Preserve your previous fail-open behavior:
+     * do not block checkout when API data is missing.
      */
-    if (
-      openingMinutes === null ||
-      closingMinutes === null ||
-      !companyTimeZone
-    ) {
+    if (currentMinutes === null || todaySettings.length === 0) {
       return true;
     }
 
-    const currentMinutes =
-      getCurrentMinutesInTimeZone(companyTimeZone);
+    const scheduleResults = todaySettings
+      .map((setting) => checkScheduleIsOpen(setting, currentMinutes))
+      .filter((result) => result !== null);
 
-    if (currentMinutes === null) {
-      return true;
-    }
-
-    // Same opening and closing time means open 24 hours.
-    if (openingMinutes === closingMinutes) {
+    /*
+     * Do not block checkout when every schedule has
+     * invalid start or end time.
+     */
+    if (scheduleResults.length === 0) {
       return true;
     }
 
     /*
-     * Normal schedule:
-     * 7:30 AM to 5:00 PM
+     * Branch is ignored.
+     * Checkout is allowed when any schedule for the
+     * current day is open.
      */
-    if (openingMinutes < closingMinutes) {
-      return (
-        currentMinutes >= openingMinutes &&
-        currentMinutes < closingMinutes
-      );
-    }
-
-    /*
-     * Overnight schedule:
-     * 6:00 PM to 2:00 AM
-     */
-    return (
-      currentMinutes >= openingMinutes ||
-      currentMinutes < closingMinutes
-    );
-  }, [
-    openingMinutes,
-    closingMinutes,
-    companyTimeZone,
-  ]);
+    return scheduleResults.some((isOpen) => isOpen === true);
+  }, [getTodayBusinessHours]);
 
   const validateBusinessHours = useCallback(() => {
+    const { settings: todaySettings } = getTodayBusinessHours();
+
     const allowed = checkIsOpenNow();
 
     if (allowed) {
@@ -208,13 +247,19 @@ export const useBusinessHours = (companyData) => {
       };
     }
 
+    const closeMessage = getLatestCloseMessage(todaySettings);
+
+    const todayBusinessHoursLabel = createBusinessHoursLabel(todaySettings);
+
     return {
       allowed: false,
-      message: businessHoursLabel
-        ? `Please order between ${businessHoursLabel}.`
-        : "Please order during our business hours.",
+      message:
+        closeMessage ||
+        (todayBusinessHoursLabel
+          ? `Please order between ${todayBusinessHoursLabel}.`
+          : "Please order during our business hours."),
     };
-  }, [businessHoursLabel, checkIsOpenNow]);
+  }, [checkIsOpenNow, getTodayBusinessHours]);
 
   return {
     businessHoursLabel,
