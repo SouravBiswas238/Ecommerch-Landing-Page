@@ -241,8 +241,13 @@ const LandingPage = ({ companyData }) => {
     showToast(`Added ${product.name} to cart!`);
   };
 
-  const handleAddWithOptions = (product, quantity, selectedOptions) => {
-    addToCartWithOptions(product, quantity, selectedOptions);
+  const handleAddWithOptions = (
+    product,
+    quantity,
+    selectedOptions,
+    productNote,
+  ) => {
+    addToCartWithOptions(product, quantity, selectedOptions, productNote);
     showToast(
       `${quantity > 1 ? quantity + "x " : ""}${product.name} added to cart!`,
     );
@@ -297,6 +302,7 @@ const LandingPage = ({ companyData }) => {
       products: cart.map((item) => ({
         product: item.product.id,
         quantity: item.quantity,
+        note: item.productNote || "",
         options: Object.fromEntries(
           Object.entries(item.selectedOptions || {}).map(([groupKey, mods]) => [
             groupKey,
@@ -312,6 +318,7 @@ const LandingPage = ({ companyData }) => {
       })),
       company: Number(companyData?.id),
     };
+
 
     try {
       const orderData = await createOrder(payload);
@@ -539,7 +546,7 @@ const LandingPage = ({ companyData }) => {
             cartSubtotal={cartSubtotal}
             onClose={() => setCheckoutOpen(false)}
             onSubmit={handleCheckoutSubmit}
-             onValidateBusinessHours={handleCheckoutRequest}
+            onValidateBusinessHours={handleCheckoutRequest}
           />
         )}
 

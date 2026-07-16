@@ -1,5 +1,3 @@
-
-
 import { useState, useEffect, useReducer, useCallback } from "react";
 import { generateCustomKey } from "@/lib/cartUtils";
 
@@ -28,12 +26,18 @@ const cartReducer = (state, action) => {
         updated[idx] = { ...updated[idx], quantity: updated[idx].quantity + 1 };
         return updated;
       }
-      return [...state, { customKey, product, quantity: 1, selectedOptions: {} }];
+      return [
+        ...state,
+        { customKey, product, quantity: 1, selectedOptions: {} },
+      ];
     }
 
     case "ADD_WITH_OPTIONS": {
-      const { product, quantity, selectedOptions } = action;
-      const customKey = generateCustomKey(product.id, selectedOptions);
+      const { product, quantity, selectedOptions, productNote = "" } = action;
+      const baseCustomKey = generateCustomKey(product.id, selectedOptions);
+      const customKey = `${baseCustomKey}-note-${encodeURIComponent(
+        productNote.trim(),
+      )}`;
 
       const modifierSurcharge = Object.values(selectedOptions)
         .flat()
@@ -50,10 +54,23 @@ const cartReducer = (state, action) => {
       const idx = state.findIndex((i) => i.customKey === customKey);
       if (idx > -1) {
         const updated = [...state];
-        updated[idx] = { ...updated[idx], quantity: updated[idx].quantity + quantity };
+        updated[idx] = {
+          ...updated[idx],
+          quantity: updated[idx].quantity + quantity,
+          productNote: productNote.trim(),
+        };
         return updated;
       }
-      return [...state, { customKey, product: enrichedProduct, quantity, selectedOptions }];
+      return [
+        ...state,
+        {
+          customKey,
+          product: enrichedProduct,
+          quantity,
+          selectedOptions,
+          productNote: productNote.trim(),
+        },
+      ];
     }
 
     case "UPDATE_QTY": {
@@ -105,9 +122,18 @@ export const useCart = () => {
     dispatch({ type: "ADD_DIRECT", product });
   }, []);
 
-  const addToCartWithOptions = useCallback((product, quantity = 1, selectedOptions = {}) => {
-    dispatch({ type: "ADD_WITH_OPTIONS", product, quantity, selectedOptions });
-  }, []);
+  const addToCartWithOptions = useCallback(
+    (product, quantity = 1, selectedOptions = {}, productNote = "") => {
+      dispatch({
+        type: "ADD_WITH_OPTIONS",
+        product,
+        quantity,
+        selectedOptions,
+        productNote,
+      });
+    },
+    [],
+  );
 
   const updateCartItemQuantity = useCallback((customKey, delta) => {
     dispatch({ type: "UPDATE_QTY", customKey, delta });
@@ -126,10 +152,13 @@ export const useCart = () => {
       const item = cart.find((i) => i.product.id === productId);
       return item ? item.quantity : 0;
     },
-    [cart]
+    [cart],
   );
 
-  const cartSubtotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  const cartSubtotal = cart.reduce(
+    (sum, item) => sum + item.product.price * item.quantity,
+    0,
+  );
   const cartTotalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return {

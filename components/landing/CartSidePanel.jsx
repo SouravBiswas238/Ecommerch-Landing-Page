@@ -84,6 +84,24 @@ const CartSidePanel = ({
               >
                 ${item.product.price.toLocaleString()} each
               </span>
+              {item.productNote && (
+                <div
+                  className="mt-2 rounded-lg px-2.5 py-2 text-xs leading-relaxed break-words"
+                  style={{
+                    background: "rgb(var(--color-primary-rgb) / 0.06)",
+                    border: "1px solid rgb(var(--color-primary-rgb) / 0.15)",
+                    color: "var(--color-body)",
+                  }}
+                >
+                  <span
+                    className="font-extrabold"
+                    style={{ color: "var(--color-secondary)" }}
+                  >
+                    Note:
+                  </span>{" "}
+                  {item.productNote}
+                </div>
+              )}
             </div>
             <div className="flex flex-col items-end gap-1.5 shrink-0">
               <div
