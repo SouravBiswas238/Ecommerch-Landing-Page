@@ -1,8 +1,14 @@
-
-
 import { useState, useEffect, useCallback } from "react";
 import {
-  X, Plus, Minus, AlertCircle, ShoppingBag, Tag, Flame, Leaf, Star,
+  X,
+  Plus,
+  Minus,
+  AlertCircle,
+  ShoppingBag,
+  Tag,
+  Flame,
+  Leaf,
+  Star,
 } from "lucide-react";
 import { getProductImages } from "@/lib/imageUtils";
 import OptionGroup from "./OptionGroup";
@@ -22,16 +28,29 @@ const ModalImageSlider = ({ images, productName }) => {
       {images.length > 1 && (
         <>
           <button
-            onClick={(e) => { e.stopPropagation(); setIdx((p) => (p === 0 ? images.length - 1 : p - 1)); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIdx((p) => (p === 0 ? images.length - 1 : p - 1));
+            }}
             className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/40 hover:bg-black/60 flex items-center justify-center text-white text-sm transition-all opacity-0 group-hover:opacity-100 cursor-pointer z-10"
-          >‹</button>
+          >
+            ‹
+          </button>
           <button
-            onClick={(e) => { e.stopPropagation(); setIdx((p) => (p === images.length - 1 ? 0 : p + 1)); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIdx((p) => (p === images.length - 1 ? 0 : p + 1));
+            }}
             className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/40 hover:bg-black/60 flex items-center justify-center text-white text-sm transition-all opacity-0 group-hover:opacity-100 cursor-pointer z-10"
-          >›</button>
+          >
+            ›
+          </button>
           <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5 z-10 pointer-events-none">
             {images.map((_, i) => (
-              <span key={i} className={`w-1.5 h-1.5 rounded-full transition-all ${i === idx ? "bg-white scale-125" : "bg-white/40"}`} />
+              <span
+                key={i}
+                className={`w-1.5 h-1.5 rounded-full transition-all ${i === idx ? "bg-white scale-125" : "bg-white/40"}`}
+              />
             ))}
           </div>
         </>
@@ -49,21 +68,31 @@ const ModalImageSlider = ({ images, productName }) => {
  *   currentCartQty – quantity already in cart (0 if none)
  *   onQtyChange    – (delta) => void — adjust existing cart qty
  */
-const ProductModal = ({ product, onClose, onAddToCart, currentCartQty = 0, onQtyChange }) => {
+const ProductModal = ({
+  product,
+  onClose,
+  onAddToCart,
+  currentCartQty = 0,
+  onQtyChange,
+}) => {
   const [quantity, setQuantity] = useState(1);
   const [selectedOptions, setSelectedOptions] = useState({});
   const [validationErrors, setValidationErrors] = useState([]);
+  const [productNote, setProductNote] = useState("");
 
   useEffect(() => {
     if (product) {
       setQuantity(1);
       setSelectedOptions({});
+      setProductNote("");
       setValidationErrors([]);
     }
   }, [product]);
 
   useEffect(() => {
-    const handler = (e) => { if (e.key === "Escape") onClose(); };
+    const handler = (e) => {
+      if (e.key === "Escape") onClose();
+    };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
   }, [onClose]);
@@ -89,7 +118,10 @@ const ProductModal = ({ product, onClose, onAddToCart, currentCartQty = 0, onQty
     const errors = [];
     Object.entries(options).forEach(([key, data]) => {
       const minSelect = data.min_select || 0;
-      const chosen = (selectedOptions[key] || []).reduce((sum, m) => sum + (m.quantity || 1), 0);
+      const chosen = (selectedOptions[key] || []).reduce(
+        (sum, m) => sum + (m.quantity || 1),
+        0,
+      );
       if (minSelect > 0 && chosen < minSelect) errors.push(key);
     });
     setValidationErrors(errors);
@@ -98,7 +130,7 @@ const ProductModal = ({ product, onClose, onAddToCart, currentCartQty = 0, onQty
 
   const handleAdd = () => {
     if (!validate()) return;
-    onAddToCart(product, quantity, selectedOptions);
+    onAddToCart(product, quantity, selectedOptions, productNote.trim());
     onClose();
   };
 
@@ -134,9 +166,15 @@ const ProductModal = ({ product, onClose, onAddToCart, currentCartQty = 0, onQty
           {/* Badges */}
           <div className="absolute top-3 left-3 flex items-center gap-1.5 z-10">
             {category && (
-              <span className="text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wide flex items-center gap-1"
-                style={{ background: "var(--color-accent)", color: "var(--color-accent-text)" }}>
-                <Tag className="w-2.5 h-2.5" />{category}
+              <span
+                className="text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wide flex items-center gap-1"
+                style={{
+                  background: "var(--color-accent)",
+                  color: "var(--color-accent-text)",
+                }}
+              >
+                <Tag className="w-2.5 h-2.5" />
+                {category}
               </span>
             )}
             {isHot && (
@@ -144,7 +182,6 @@ const ProductModal = ({ product, onClose, onAddToCart, currentCartQty = 0, onQty
                 <Flame className="w-2.5 h-2.5" /> Hot
               </span>
             )}
-          
           </div>
 
           {/* Name overlay */}
@@ -153,11 +190,19 @@ const ProductModal = ({ product, onClose, onAddToCart, currentCartQty = 0, onQty
               {product.name}
             </h2>
             <div className="flex items-center gap-1.5 mt-0.5">
-              <span className="font-extrabold text-base drop-shadow-md" style={{ color: "var(--color-accent)" }}>
-                ${product.price.toLocaleString("en-US", { minimumFractionDigits: 0 })}
+              <span
+                className="font-extrabold text-base drop-shadow-md"
+                style={{ color: "var(--color-accent)" }}
+              >
+                $
+                {product.price.toLocaleString("en-US", {
+                  minimumFractionDigits: 0,
+                })}
               </span>
               {modifierSurcharge > 0 && (
-                <span className="text-white/70 text-xs">+ ${modifierSurcharge} extras</span>
+                <span className="text-white/70 text-xs">
+                  + ${modifierSurcharge} extras
+                </span>
               )}
             </div>
           </div>
@@ -171,7 +216,9 @@ const ProductModal = ({ product, onClose, onAddToCart, currentCartQty = 0, onQty
                 <h4 className="text-[10px] font-extrabold text-[#808080] uppercase tracking-widest mb-1.5">
                   About this item
                 </h4>
-                <p className="text-sm text-[#374151] leading-relaxed">{product.description}</p>
+                <p className="text-sm text-[#374151] leading-relaxed">
+                  {product.description}
+                </p>
               </div>
             )}
 
@@ -179,8 +226,14 @@ const ProductModal = ({ product, onClose, onAddToCart, currentCartQty = 0, onQty
             {hasOptions && (
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <Star className="w-3.5 h-3.5" style={{ color: "var(--color-primary)" }} />
-                  <h4 className="text-xs font-extrabold uppercase tracking-wider" style={{ color: "var(--color-secondary)" }}>
+                  <Star
+                    className="w-3.5 h-3.5"
+                    style={{ color: "var(--color-primary)" }}
+                  />
+                  <h4
+                    className="text-xs font-extrabold uppercase tracking-wider"
+                    style={{ color: "var(--color-secondary)" }}
+                  >
                     Customize Your Order
                   </h4>
                 </div>
@@ -197,7 +250,11 @@ const ProductModal = ({ product, onClose, onAddToCart, currentCartQty = 0, onQty
                 {Object.entries(options).map(([groupKey, groupData]) => (
                   <div
                     key={groupKey}
-                    className={validationErrors.includes(groupKey) ? "ring-2 ring-[#dc3545] ring-offset-1 rounded-2xl" : ""}
+                    className={
+                      validationErrors.includes(groupKey)
+                        ? "ring-2 ring-[#dc3545] ring-offset-1 rounded-2xl"
+                        : ""
+                    }
                   >
                     <OptionGroup
                       groupKey={groupKey}
@@ -211,60 +268,185 @@ const ProductModal = ({ product, onClose, onAddToCart, currentCartQty = 0, onQty
             )}
 
             {/* Quantity Selector */}
-            <div className="flex items-center justify-between bg-[#f9f9f9] rounded-2xl px-4 py-3" style={{ border: "1px solid var(--color-border)" }}>
-              <span className="text-xs font-extrabold uppercase tracking-wider" style={{ color: "var(--color-secondary)" }}>Quantity</span>
+            <div
+              className="flex items-center justify-between bg-[#f9f9f9] rounded-2xl px-4 py-3"
+              style={{ border: "1px solid var(--color-border)" }}
+            >
+              <span
+                className="text-xs font-extrabold uppercase tracking-wider"
+                style={{ color: "var(--color-secondary)" }}
+              >
+                Quantity
+              </span>
               <div className="flex items-center gap-3">
                 <button
                   type="button"
                   onClick={() => setQuantity((p) => Math.max(1, p - 1))}
                   className="w-8 h-8 rounded-full bg-white flex items-center justify-center transition-all cursor-pointer shadow-sm active:scale-95"
-                  style={{ border: "1px solid var(--color-border)", color: "var(--color-primary)" }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "var(--color-primary)"; e.currentTarget.style.color = "var(--color-primary-text)"; e.currentTarget.style.borderColor = "var(--color-primary)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "white"; e.currentTarget.style.color = "var(--color-primary)"; e.currentTarget.style.borderColor = "var(--color-border)"; }}
+                  style={{
+                    border: "1px solid var(--color-border)",
+                    color: "var(--color-primary)",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "var(--color-primary)";
+                    e.currentTarget.style.color = "var(--color-primary-text)";
+                    e.currentTarget.style.borderColor = "var(--color-primary)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "white";
+                    e.currentTarget.style.color = "var(--color-primary)";
+                    e.currentTarget.style.borderColor = "var(--color-border)";
+                  }}
                 >
                   <Minus className="w-3.5 h-3.5" />
                 </button>
-                <span className="w-8 text-center font-extrabold text-base" style={{ color: "var(--color-secondary)" }}>{quantity}</span>
+                <span
+                  className="w-8 text-center font-extrabold text-base"
+                  style={{ color: "var(--color-secondary)" }}
+                >
+                  {quantity}
+                </span>
                 <button
                   type="button"
                   onClick={() => setQuantity((p) => p + 1)}
                   className="w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer shadow-sm active:scale-95"
-                  style={{ background: "var(--color-primary)", border: "1px solid var(--color-primary)", color: "var(--color-primary-text)" }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "var(--color-primary-hover)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "var(--color-primary)"; }}
+                  style={{
+                    background: "var(--color-primary)",
+                    border: "1px solid var(--color-primary)",
+                    color: "var(--color-primary-text)",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background =
+                      "var(--color-primary-hover)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "var(--color-primary)";
+                  }}
                 >
                   <Plus className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
 
+            {/* Product Note */}
+            <div className="space-y-1.5">
+              <label
+                className="text-xs font-extrabold uppercase tracking-wider block"
+                style={{ color: "var(--color-secondary)" }}
+              >
+                Order Note
+                <span
+                  className="ml-1 normal-case font-medium"
+                  style={{ color: "var(--color-muted)" }}
+                >
+                  (Optional)
+                </span>
+              </label>
+
+              <textarea
+                value={productNote}
+                onChange={(e) => setProductNote(e.target.value)}
+                placeholder="e.g. No onion, less spicy, extra napkins..."
+                rows={3}
+                maxLength={250}
+                className="w-full bg-[#f9f9f9] rounded-xl px-4 py-3 text-xs focus:outline-none transition-all resize-none"
+                style={{
+                  border: "1px solid var(--color-border)",
+                  color: "var(--color-body)",
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = "var(--color-primary)";
+                  e.currentTarget.style.boxShadow =
+                    "0 0 0 2px rgb(var(--color-primary-rgb) / 0.1)";
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = "var(--color-border)";
+                  e.currentTarget.style.boxShadow = "none";
+                }}
+              />
+
+              <div className="flex items-center justify-between">
+                <p
+                  className="text-[10px]"
+                  style={{ color: "var(--color-muted)" }}
+                >
+                  This note applies only to this product.
+                </p>
+
+                <span
+                  className="text-[10px]"
+                  style={{ color: "var(--color-muted)" }}
+                >
+                  {productNote.length}/250
+                </span>
+              </div>
+            </div>
+
             {/* Price summary strip */}
             {(modifierSurcharge > 0 || quantity > 1) && (
-              <div className="rounded-2xl px-4 py-3 space-y-1.5 text-xs"
+              <div
+                className="rounded-2xl px-4 py-3 space-y-1.5 text-xs"
                 style={{
                   background: "rgb(var(--color-primary-rgb) / 0.06)",
                   border: "1px solid rgb(var(--color-primary-rgb) / 0.2)",
-                }}>
-                <div className="flex justify-between" style={{ color: "var(--color-muted)" }}>
+                }}
+              >
+                <div
+                  className="flex justify-between"
+                  style={{ color: "var(--color-muted)" }}
+                >
                   <span>Base price</span>
-                  <span className="font-bold" style={{ color: "var(--color-body)" }}>${product.price.toLocaleString()}</span>
+                  <span
+                    className="font-bold"
+                    style={{ color: "var(--color-body)" }}
+                  >
+                    ${product.price.toLocaleString()}
+                  </span>
                 </div>
                 {modifierSurcharge > 0 && (
-                  <div className="flex justify-between" style={{ color: "var(--color-muted)" }}>
+                  <div
+                    className="flex justify-between"
+                    style={{ color: "var(--color-muted)" }}
+                  >
                     <span>Extras</span>
-                    <span className="font-bold" style={{ color: "var(--color-primary)" }}>+${modifierSurcharge.toLocaleString()}</span>
+                    <span
+                      className="font-bold"
+                      style={{ color: "var(--color-primary)" }}
+                    >
+                      +${modifierSurcharge.toLocaleString()}
+                    </span>
                   </div>
                 )}
                 {quantity > 1 && (
-                  <div className="flex justify-between" style={{ color: "var(--color-muted)" }}>
+                  <div
+                    className="flex justify-between"
+                    style={{ color: "var(--color-muted)" }}
+                  >
                     <span>× {quantity} items</span>
-                    <span className="font-bold" style={{ color: "var(--color-body)" }}>${unitPrice.toLocaleString()} each</span>
+                    <span
+                      className="font-bold"
+                      style={{ color: "var(--color-body)" }}
+                    >
+                      ${unitPrice.toLocaleString()} each
+                    </span>
                   </div>
                 )}
-                <div className="flex justify-between pt-1.5 border-t text-sm"
-                  style={{ borderColor: "rgb(var(--color-primary-rgb) / 0.2)" }}>
-                  <span className="font-extrabold" style={{ color: "var(--color-secondary)" }}>Total</span>
-                  <span className="font-extrabold" style={{ color: "var(--color-primary)" }}>${totalPrice.toLocaleString()}</span>
+                <div
+                  className="flex justify-between pt-1.5 border-t text-sm"
+                  style={{ borderColor: "rgb(var(--color-primary-rgb) / 0.2)" }}
+                >
+                  <span
+                    className="font-extrabold"
+                    style={{ color: "var(--color-secondary)" }}
+                  >
+                    Total
+                  </span>
+                  <span
+                    className="font-extrabold"
+                    style={{ color: "var(--color-primary)" }}
+                  >
+                    ${totalPrice.toLocaleString()}
+                  </span>
                 </div>
               </div>
             )}
@@ -273,27 +455,50 @@ const ProductModal = ({ product, onClose, onAddToCart, currentCartQty = 0, onQty
         </div>
 
         {/* STICKY FOOTER */}
-        <div className="shrink-0 px-4 sm:px-5 py-4 border-t flex items-center gap-3"
-          style={{ borderColor: "var(--color-border)", background: "var(--color-bg)" }}>
+        <div
+          className="shrink-0 px-4 sm:px-5 py-4 border-t flex items-center gap-3"
+          style={{
+            borderColor: "var(--color-border)",
+            background: "var(--color-bg)",
+          }}
+        >
           {currentCartQty > 0 ? (
             <>
-              <div className="flex items-center bg-[#f9f9f9] rounded-xl px-3 py-2 gap-2 shrink-0" style={{ border: "1px solid var(--color-border)" }}>
+              <div
+                className="flex items-center bg-[#f9f9f9] rounded-xl px-3 py-2 gap-2 shrink-0"
+                style={{ border: "1px solid var(--color-border)" }}
+              >
                 <button
                   onClick={() => onQtyChange?.(-1)}
                   className="w-6 h-6 rounded-full flex items-center justify-center cursor-pointer transition-all"
                   style={{ color: "var(--color-primary)" }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "rgb(var(--color-primary-rgb) / 0.1)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background =
+                      "rgb(var(--color-primary-rgb) / 0.1)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "transparent";
+                  }}
                 >
                   <Minus className="w-3 h-3" />
                 </button>
-                <span className="w-5 text-center text-xs font-extrabold" style={{ color: "var(--color-secondary)" }}>{currentCartQty}</span>
+                <span
+                  className="w-5 text-center text-xs font-extrabold"
+                  style={{ color: "var(--color-secondary)" }}
+                >
+                  {currentCartQty}
+                </span>
                 <button
                   onClick={() => onQtyChange?.(1)}
                   className="w-6 h-6 rounded-full flex items-center justify-center cursor-pointer transition-all"
                   style={{ color: "var(--color-primary)" }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "rgb(var(--color-primary-rgb) / 0.1)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background =
+                      "rgb(var(--color-primary-rgb) / 0.1)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "transparent";
+                  }}
                 >
                   <Plus className="w-3 h-3" />
                 </button>
@@ -306,11 +511,17 @@ const ProductModal = ({ product, onClose, onAddToCart, currentCartQty = 0, onQty
                   color: "var(--color-primary-text)",
                   boxShadow: "0 4px 12px rgb(var(--color-primary-rgb) / 0.15)",
                 }}
-                onMouseEnter={e => { e.currentTarget.style.background = "var(--color-primary-hover)"; }}
-                onMouseLeave={e => { e.currentTarget.style.background = "var(--color-primary)"; }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background =
+                    "var(--color-primary-hover)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "var(--color-primary)";
+                }}
               >
                 <Plus className="w-4 h-4 stroke-[2.5]" />
-                Add {quantity > 1 ? `${quantity} more` : "another"} — ${totalPrice.toLocaleString()}
+                Add {quantity > 1 ? `${quantity} more` : "another"} — $
+                {totalPrice.toLocaleString()}
               </button>
             </>
           ) : (
@@ -322,11 +533,15 @@ const ProductModal = ({ product, onClose, onAddToCart, currentCartQty = 0, onQty
                 color: "var(--color-primary-text)",
                 boxShadow: "0 4px 12px rgb(var(--color-primary-rgb) / 0.15)",
               }}
-              onMouseEnter={e => { e.currentTarget.style.background = "var(--color-primary-hover)"; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "var(--color-primary)"; }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "var(--color-primary-hover)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "var(--color-primary)";
+              }}
             >
               <ShoppingBag className="w-4 h-4" />
-              Add to Order — ${totalPrice.toLocaleString()}
+              Add to cart — ${totalPrice.toLocaleString()}
             </button>
           )}
         </div>
