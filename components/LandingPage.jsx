@@ -147,7 +147,17 @@ const LandingPage = ({ companyData }) => {
         const data = await fetchMenu(companyData?.id);
 
         if (Array.isArray(data) && data.length > 0) {
-          setProducts(data.filter((product) => product.is_active !== false));
+          const activeProducts = data.filter(
+            (product) => product.is_active !== false,
+          );
+
+          const sortedProducts = activeProducts.sort(
+            (a, b) =>
+              Number(a.attributes?.sorting_index ?? 999999) -
+              Number(b.attributes?.sorting_index ?? 999999),
+          );
+
+          setProducts(sortedProducts);
         } else {
           setProducts([]);
           setShowSkeletonFallback(true);
@@ -167,6 +177,7 @@ const LandingPage = ({ companyData }) => {
     }
   }, [companyData?.id]);
 
+
   useEffect(() => {
     const loadBusinessHours = async () => {
       if (!companyData?.id) {
@@ -176,7 +187,6 @@ const LandingPage = ({ companyData }) => {
 
       try {
         const settings = await fetchCompanyOpenSettings(companyData.id);
-        console.log("Fetched business hours settings:----------", settings);
 
         setBusinessHourSettings(settings);
       } catch (error) {
@@ -188,8 +198,6 @@ const LandingPage = ({ companyData }) => {
 
     loadBusinessHours();
   }, [companyData?.id]);
-
-  console.log("Business Hour Settings:", businessHourSettings);
 
 
   // ── Redirect countdown ──
@@ -269,6 +277,7 @@ const LandingPage = ({ companyData }) => {
       return matchesCategory && matchesSearch;
     });
   }, [products, selectedCategory, searchQuery]);
+
 
   const cartTotal = cartSubtotal; // delivery fee computed inside CheckoutModal via useDeliveryCharge
 
