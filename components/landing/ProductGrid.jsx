@@ -27,6 +27,7 @@ const ProductGrid = ({
   onUpdateQty,
   getSimpleProductQty,
   onResetFilters,
+  placeholderImage,
 }) => {
   if (loading || showSkeletonFallback) {
     return (
@@ -114,12 +115,12 @@ const ProductGrid = ({
             {/* Product Image */}
             <div className="w-24 h-24 md:w-28 md:h-28 rounded-xl overflow-hidden bg-[#f9f9f9] border border-[#E5E7EB]/50 shrink-0 relative">
               <img
-                src={getSingleProductImage(product)}
+                src={getSingleProductImage(product, placeholderImage)}
                 alt={product.name}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                className="w-full h-full object-fit transition-transform duration-500 group-hover:scale-95"
                 loading="lazy"
                 onError={(e) => {
-                  e.target.src = getProductImage(product);
+                  e.target.src = placeholderImage;
                 }}
               />
             </div>

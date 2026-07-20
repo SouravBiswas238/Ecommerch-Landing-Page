@@ -48,10 +48,21 @@ const LandingPage = ({ companyData }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showSkeletonFallback, setShowSkeletonFallback] = useState(false);
+  
+  console.log(products, "products in landing page");
 
   // ── Search & filter ──
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+
+  // console.log("LandingPage companyData:", companyData?.attributes?.placeholder_image);
+
+  const placeholderImage = useMemo(() => {
+    const placeholder = companyData?.attributes?.placeholder_image;
+    return placeholder;
+  }, [companyData?.attributes?.placeholder_image]);
+
+
 
   // ── Cart (via hook) ──
   const {
@@ -515,6 +526,7 @@ const LandingPage = ({ companyData }) => {
                 onAddDirect={handleAddDirect}
                 onUpdateQty={updateCartItemQuantity}
                 getSimpleProductQty={getSimpleProductQty}
+                placeholderImage={placeholderImage}
                 onResetFilters={() => {
                   setSelectedCategory("All");
                   setSearchQuery("");
