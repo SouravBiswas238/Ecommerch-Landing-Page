@@ -20,7 +20,7 @@ export function ThemeProvider({ companyData, children }) {
   const theme = useMemo(() => buildTheme(companyData), [companyData]);
   const cssVars = useMemo(() => themeToCssVars(theme), [theme]);
 
-  console.log("ThemeProvider: companyData", companyData);
+  // console.log("ThemeProvider: companyData", companyData);
 
   // Inject CSS variables onto <html> so they cascade to every element
   useEffect(() => {
