@@ -49,7 +49,7 @@ const LandingPage = ({ companyData }) => {
   const [loading, setLoading] = useState(true);
   const [showSkeletonFallback, setShowSkeletonFallback] = useState(false);
   
-  console.log(products, "products in landing page");
+  // console.log(products, "products in landing page");
 
   // ── Search & filter ──
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -63,6 +63,7 @@ const LandingPage = ({ companyData }) => {
     const placeholder = companyData?.attributes?.placeholder_image;
     return placeholder;
   }, [companyData?.attributes?.placeholder_image]);
+
 
 
 
@@ -226,68 +227,51 @@ const LandingPage = ({ companyData }) => {
     }
   }, [redirectCountdown, orderSuccess, placedOrderDetails]);
 
+  // console.log( companyData?.attributes?.categories, "companyData?.attributes?.categories in landing page");
+
   // ── Categories from company data ──
   const categories = useMemo(() => {
-    const companyCategories = companyData?.attributes?.categories;
+  const companyCategories = companyData?.attributes?.categories;
 
-    if (!Array.isArray(companyCategories)) {
-      return ["All"];
+  if (!Array.isArray(companyCategories)) {
+    return [{ label: "All", value: "All" }];
+  }
+
+  // Keep both combined and standalone categories
+  return [
+    { label: "All", value: "All" },
+    ...companyCategories,
+  ];
+}, [companyData?.attributes?.categories]);
+
+ const filteredProducts = useMemo(() => {
+  const query = searchQuery.trim().toLowerCase();
+
+  return products.filter((product) => {
+    const productCategory = product.attributes?.category?.trim();
+
+    let matchesCategory = false;
+
+    if (selectedCategory === "All") {
+      matchesCategory = true;
+    } else if (Array.isArray(selectedCategory)) {
+      // Example: ["Sandwiches", "Sides"]
+      matchesCategory = selectedCategory.includes(productCategory);
+    } else {
+      // Example: "Sandwiches"
+      matchesCategory = productCategory === selectedCategory;
     }
 
-    const categoriesInsideCombined = new Set();
+    const matchesSearch =
+      !query ||
+      product.name?.toLowerCase().includes(query) ||
+      product.description?.toLowerCase().includes(query);
 
-    companyCategories.forEach((category) => {
-      if (category.includes(" & ")) {
-        category
-          .split(" & ")
-          .map((item) => item.trim())
-          .forEach((item) => categoriesInsideCombined.add(item));
-      }
-    });
+    return matchesCategory && matchesSearch;
+  });
+}, [products, selectedCategory, searchQuery]);
 
-    const filteredCategories = companyCategories.filter((category) => {
-      // Keep combined category
-      if (category.includes(" & ")) {
-        return true;
-      }
-
-      // Remove standalone category if it is already
-      // included inside a combined category
-      return !categoriesInsideCombined.has(category);
-    });
-
-    return ["All", ...filteredCategories];
-  }, [companyData]);
-
-  const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
-      const productCategory = product.attributes?.category;
-
-      let matchesCategory = false;
-
-      if (selectedCategory === "All") {
-        matchesCategory = true;
-      } else if (selectedCategory.includes(" & ")) {
-        const combinedCategories = selectedCategory
-          .split(" & ")
-          .map((category) => category.trim());
-
-        matchesCategory =
-          combinedCategories.includes(productCategory) ||
-          productCategory === selectedCategory;
-      } else {
-        matchesCategory = productCategory === selectedCategory;
-      }
-
-      const query = searchQuery.toLowerCase();
-
-      const matchesSearch =
-        product.name?.toLowerCase().includes(query) ||
-        product.description?.toLowerCase().includes(query);
-
-      return matchesCategory && matchesSearch;
-    });
-  }, [products, selectedCategory, searchQuery]);
+  // console.log("filteredProducts:------", filteredProducts, "selectedCategory:", selectedCategory,);
 
 
   const cartTotal = cartSubtotal; // delivery fee computed inside CheckoutModal via useDeliveryCharge

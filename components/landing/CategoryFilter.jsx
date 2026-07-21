@@ -1,44 +1,62 @@
 import React, { useRef, useState } from "react";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 
-const CategoryFilter = ({ categories, selectedCategory, onSelect }) => {
+const CategoryFilter = ({
+  categories = [],
+  selectedCategory,
+  onSelect,
+}) => {
   const scrollRef = useRef(null);
   const [isAtRight, setIsAtRight] = useState(false);
 
   const handleArrowClick = () => {
-    const el = scrollRef.current;
-    if (!el) return;
+    const element = scrollRef.current;
 
-    if (!isAtRight) {
-      el.scrollTo({
-        left: el.scrollWidth,
-        behavior: "smooth",
-      });
-      setIsAtRight(true);
-    } else {
-      el.scrollTo({
-        left: 0,
-        behavior: "smooth",
-      });
-      setIsAtRight(false);
-    }
+    if (!element) return;
+
+    element.scrollTo({
+      left: isAtRight ? 0 : element.scrollWidth,
+      behavior: "smooth",
+    });
+
+    setIsAtRight((previousValue) => !previousValue);
   };
 
   const handleScroll = () => {
-    const el = scrollRef.current;
-    if (!el) return;
+    const element = scrollRef.current;
+
+    if (!element) return;
 
     const reachedRight =
-      el.scrollLeft + el.clientWidth >= el.scrollWidth - 10;
+      element.scrollLeft + element.clientWidth >=
+      element.scrollWidth - 10;
 
     setIsAtRight(reachedRight);
+  };
+
+  const isSameCategory = (selectedValue, categoryValue) => {
+    if (
+      Array.isArray(selectedValue) &&
+      Array.isArray(categoryValue)
+    ) {
+      return (
+        selectedValue.length === categoryValue.length &&
+        selectedValue.every(
+          (item, index) => item === categoryValue[index],
+        )
+      );
+    }
+
+    return selectedValue === categoryValue;
   };
 
   return (
     <div>
       <h3
         className="text-sm font-bold uppercase tracking-widest mb-3"
-        style={{ color: "var(--color-muted)" }}
+        style={{
+          color: "var(--color-muted)",
+        }}
       >
         Browse Categories
       </h3>
@@ -53,13 +71,19 @@ const CategoryFilter = ({ categories, selectedCategory, onSelect }) => {
             WebkitOverflowScrolling: "touch",
           }}
         >
-          {categories?.map((cat) => {
-            const isActive = selectedCategory === cat;
+          {categories.map((category) => {
+            const isActive = isSameCategory(
+              selectedCategory,
+              category.value,
+            );
+
+            const isAllCategory = category.value === "All";
 
             return (
               <button
-                key={cat}
-                onClick={() => onSelect(cat)}
+                key={category.label}
+                type="button"
+                onClick={() => onSelect(category.value)}
                 className="snap-start shrink-0 px-5 py-2.5 rounded-full text-sm font-semibold tracking-wide border cursor-pointer transition-all duration-300 whitespace-nowrap"
                 style={
                   isActive
@@ -77,22 +101,28 @@ const CategoryFilter = ({ categories, selectedCategory, onSelect }) => {
                         color: "var(--color-body)",
                       }
                 }
-                onMouseEnter={(e) => {
+                onMouseEnter={(event) => {
                   if (!isActive) {
-                    e.currentTarget.style.borderColor =
+                    event.currentTarget.style.borderColor =
                       "var(--color-primary)";
-                    e.currentTarget.style.color = "var(--color-primary)";
+
+                    event.currentTarget.style.color =
+                      "var(--color-primary)";
                   }
                 }}
-                onMouseLeave={(e) => {
+                onMouseLeave={(event) => {
                   if (!isActive) {
-                    e.currentTarget.style.borderColor =
+                    event.currentTarget.style.borderColor =
                       "var(--color-border)";
-                    e.currentTarget.style.color = "var(--color-body)";
+
+                    event.currentTarget.style.color =
+                      "var(--color-body)";
                   }
                 }}
               >
-                {cat === "All" ? "⭐ All Items" : cat}
+                {isAllCategory
+                  ? "⭐ All Items"
+                  : category.label}
               </button>
             );
           })}
@@ -107,6 +137,11 @@ const CategoryFilter = ({ categories, selectedCategory, onSelect }) => {
             borderColor: "var(--color-border)",
             color: "var(--color-primary)",
           }}
+          aria-label={
+            isAtRight
+              ? "Scroll categories left"
+              : "Scroll categories right"
+          }
         >
           {isAtRight ? (
             <ChevronLeft size={20} strokeWidth={2.5} />
