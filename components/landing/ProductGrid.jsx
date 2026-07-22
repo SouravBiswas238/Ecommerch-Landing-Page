@@ -117,7 +117,7 @@ const ProductGrid = ({
               <img
                 src={getSingleProductImage(product, placeholderImage)}
                 alt={product.name}
-                className="w-full h-full object-fit transition-transform duration-500 group-hover:scale-95"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
                 onError={(e) => {
                   e.target.src = placeholderImage;
