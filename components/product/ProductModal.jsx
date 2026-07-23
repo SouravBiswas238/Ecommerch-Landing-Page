@@ -247,6 +247,10 @@ const ProductModal = ({
                   </div>
                 )}
 
+                {
+                  console.log("Selected Options:", options) // Debugging line to check selected options
+                }
+
                 {Object.entries(options).map(([groupKey, groupData]) => (
                   <div
                     key={groupKey}
