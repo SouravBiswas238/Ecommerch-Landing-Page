@@ -485,7 +485,7 @@ const OptionGroup = ({
 
                     {isFixedQuantity && (
                       <span className="block text-[10px] text-[#808080] mt-0.5">
-                        Fixed quantity: {fixedQuantity}
+                        Quantity: {fixedQuantity}
                       </span>
                     )}
 
@@ -500,7 +500,7 @@ const OptionGroup = ({
                 {/* Right side */}
                 <div className="flex items-center gap-2 shrink-0 ml-3">
                   {/* Fixed quantity display */}
-                  {active && isFixedQuantity && (
+                  {/* {active && isFixedQuantity && (
                     <span
                       className="px-2.5 py-1 text-[11px] font-extrabold rounded-full"
                       style={{
@@ -511,7 +511,7 @@ const OptionGroup = ({
                     >
                       Qty: {currentQuantity}
                     </span>
-                  )}
+                  )} */}
 
                   {/* Adjustable quantity stepper */}
                   {active && canAdjustQuantity && (
