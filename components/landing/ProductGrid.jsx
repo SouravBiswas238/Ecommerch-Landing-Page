@@ -65,7 +65,7 @@ const ProductGrid = ({
           </h4>
           <p className="text-sm mt-1" style={{ color: "var(--color-muted)" }}>
             {hasActiveFilters
-              ? `We couldn&apos;t find any dishes matching ${searchQuery ? `"${searchQuery}"` : "your current filters"}. Try selecting another category!`
+              ? `We could not find any dishes matching ${searchQuery ? `"${searchQuery}"` : "your current filters"}. Try selecting another category!`
               : "The restaurant menu is not available right now. Please check back soon."}
           </p>
         </div>
