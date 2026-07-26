@@ -13,21 +13,27 @@ import {
 import { getProductImages } from "@/lib/imageUtils";
 import OptionGroup from "./OptionGroup";
 
-const ModalImageSlider = ({ images, productName }) => {
+const ModalImageSlider = ({ images, productName, placeholderImage }) => {
   const [idx, setIdx] = useState(0);
-  if (!images || images.length === 0) return null;
+  const currentImage = images?.[idx] || placeholderImage;
   return (
     <div className="w-full h-full relative group select-none overflow-hidden">
       <img
-        key={idx}
-        src={images[idx]}
+        key={`${idx}-${currentImage}`}
+        src={currentImage}
         alt={`${productName} - view ${idx + 1}`}
         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         loading="lazy"
+        onError={(e) => {
+          e.currentTarget.onerror = null;
+          e.currentTarget.src = fallbackImage;
+        }}
       />
-      {images.length > 1 && (
+
+      {images?.length > 1 && (
         <>
           <button
+            type="button"
             onClick={(e) => {
               e.stopPropagation();
               setIdx((p) => (p === 0 ? images.length - 1 : p - 1));
@@ -36,7 +42,9 @@ const ModalImageSlider = ({ images, productName }) => {
           >
             ‹
           </button>
+
           <button
+            type="button"
             onClick={(e) => {
               e.stopPropagation();
               setIdx((p) => (p === images.length - 1 ? 0 : p + 1));
@@ -45,11 +53,14 @@ const ModalImageSlider = ({ images, productName }) => {
           >
             ›
           </button>
+
           <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5 z-10 pointer-events-none">
             {images.map((_, i) => (
               <span
                 key={i}
-                className={`w-1.5 h-1.5 rounded-full transition-all ${i === idx ? "bg-white scale-125" : "bg-white/40"}`}
+                className={`w-1.5 h-1.5 rounded-full transition-all ${
+                  i === idx ? "bg-white scale-125" : "bg-white/40"
+                }`}
               />
             ))}
           </div>
@@ -70,6 +81,7 @@ const ModalImageSlider = ({ images, productName }) => {
  */
 const ProductModal = ({
   product,
+  placeholderImage,
   onClose,
   onAddToCart,
   currentCartQty = 0,
@@ -104,7 +116,7 @@ const ProductModal = ({
 
   if (!product) return null;
 
-  const images = getProductImages(product);
+  const images = getProductImages(product, placeholderImage);
   const options = product.options || {};
   const hasOptions = Object.keys(options).length > 0;
 
@@ -152,7 +164,11 @@ const ProductModal = ({
       >
         {/* IMAGE HEADER */}
         <div className="relative w-full h-52 sm:h-60 shrink-0 bg-[#f9f9f9]">
-          <ModalImageSlider images={images} productName={product.name} />
+          <ModalImageSlider
+            images={images}
+            productName={product.name}
+            placeholderImage={placeholderImage}
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/10 pointer-events-none" />
 
           {/* Close */}
