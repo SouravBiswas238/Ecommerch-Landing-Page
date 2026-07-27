@@ -119,18 +119,22 @@ const ProductModal = ({
   const images = getProductImages(product, placeholderImage);
   const options = product.options || {};
   const hasOptions = Object.keys(options).length > 0;
+  const getOrderIndex = (group) => {
+    const value = group?.order_index;
+
+    if (value === undefined || value === null || value === "") {
+      return Number.MAX_SAFE_INTEGER;
+    }
+
+    const orderIndex = Number(value);
+
+    return Number.isFinite(orderIndex) ? orderIndex : Number.MAX_SAFE_INTEGER;
+  };
+
   const sortedOptions = Object.entries(options).sort(
-    ([, firstGroup], [, secondGroup]) => {
-      const firstOrder = Number(firstGroup?.order_index);
-      const secondOrder = Number(secondGroup?.order_index);
-
-      return (
-        (Number.isFinite(firstOrder) ? firstOrder : Number.MAX_SAFE_INTEGER) -
-        (Number.isFinite(secondOrder) ? secondOrder : Number.MAX_SAFE_INTEGER)
-      );
-    },
+    ([, firstGroup], [, secondGroup]) =>
+      getOrderIndex(firstGroup) - getOrderIndex(secondGroup),
   );
-
   const modifierSurcharge = Object.values(selectedOptions)
     .flat()
     .reduce((sum, mod) => sum + (mod.price || 0) * (mod.quantity ?? 1), 0);
