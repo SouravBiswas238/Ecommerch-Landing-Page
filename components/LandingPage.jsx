@@ -48,7 +48,7 @@ const LandingPage = ({ companyData }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showSkeletonFallback, setShowSkeletonFallback] = useState(false);
-  
+
   // console.log(products, "products in landing page");
 
   // ── Search & filter ──
@@ -63,9 +63,6 @@ const LandingPage = ({ companyData }) => {
     const placeholder = companyData?.attributes?.placeholder_image;
     return placeholder;
   }, [companyData?.attributes?.placeholder_image]);
-
-
-
 
   // ── Cart (via hook) ──
   const {
@@ -189,7 +186,6 @@ const LandingPage = ({ companyData }) => {
     }
   }, [companyData?.id]);
 
-
   useEffect(() => {
     const loadBusinessHours = async () => {
       if (!companyData?.id) {
@@ -211,7 +207,6 @@ const LandingPage = ({ companyData }) => {
     loadBusinessHours();
   }, [companyData?.id]);
 
-
   // ── Redirect countdown ──
   useEffect(() => {
     if (redirectCountdown > 0) {
@@ -231,48 +226,49 @@ const LandingPage = ({ companyData }) => {
 
   // ── Categories from company data ──
   const categories = useMemo(() => {
-  const companyCategories = companyData?.attributes?.categories;
+    const companyCategories = companyData?.attributes?.categories;
 
-  if (!Array.isArray(companyCategories)) {
-    return [{ label: "All", value: "All" }];
-  }
-
-  // Keep both combined and standalone categories
-  return [
-    { label: "All", value: "All" },
-    ...companyCategories,
-  ];
-}, [companyData?.attributes?.categories]);
-
- const filteredProducts = useMemo(() => {
-  const query = searchQuery.trim().toLowerCase();
-
-  return products.filter((product) => {
-    const productCategory = product.attributes?.category?.trim();
-
-    let matchesCategory = false;
-
-    if (selectedCategory === "All") {
-      matchesCategory = true;
-    } else if (Array.isArray(selectedCategory)) {
-      // Example: ["Sandwiches", "Sides"]
-      matchesCategory = selectedCategory.includes(productCategory);
-    } else {
-      // Example: "Sandwiches"
-      matchesCategory = productCategory === selectedCategory;
+    if (!Array.isArray(companyCategories)) {
+      return [{ label: "All", value: "All" }];
     }
 
-    const matchesSearch =
-      !query ||
-      product.name?.toLowerCase().includes(query) ||
-      product.description?.toLowerCase().includes(query);
+    // Keep both combined and standalone categories
+    return [{ label: "All", value: "All" }, ...companyCategories];
+  }, [companyData?.attributes?.categories]);
 
-    return matchesCategory && matchesSearch;
-  });
-}, [products, selectedCategory, searchQuery]);
+  const filteredProducts = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
 
-  // console.log("filteredProducts:------", filteredProducts, "selectedCategory:", selectedCategory,);
+    return products.filter((product) => {
+      const productCategory = product.attributes?.category?.trim();
 
+      let matchesCategory = false;
+
+      if (selectedCategory === "All") {
+        matchesCategory = true;
+      } else if (Array.isArray(selectedCategory)) {
+        // Example: ["Sandwiches", "Sides"]
+        matchesCategory = selectedCategory.includes(productCategory);
+      } else {
+        // Example: "Sandwiches"
+        matchesCategory = productCategory === selectedCategory;
+      }
+
+      const matchesSearch =
+        !query ||
+        product.name?.toLowerCase().includes(query) ||
+        product.description?.toLowerCase().includes(query);
+
+      return matchesCategory && matchesSearch;
+    });
+  }, [products, selectedCategory, searchQuery]);
+
+  // console.log(
+  //   "filteredProducts:------",
+  //   filteredProducts,
+  //   "selectedCategory:",
+  //   selectedCategory,
+  // );
 
   const cartTotal = cartSubtotal; // delivery fee computed inside CheckoutModal via useDeliveryCharge
 
@@ -551,6 +547,7 @@ const LandingPage = ({ companyData }) => {
         {/* Product Modal */}
         <ProductModal
           product={selectedProduct}
+          placeholderImage={placeholderImage}
           onClose={() => setSelectedProduct(null)}
           onAddToCart={handleAddWithOptions}
           currentCartQty={
