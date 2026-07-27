@@ -15,7 +15,7 @@ const HeroSection = ({ companyId, onProductClick }) => {
 
         const data = await fetchTopOrderedProducts(companyId);
 
-        console.log("HeroSection: fetched top ordered products", data);
+        // console.log("HeroSection: fetched top ordered products", data);
 
         setTopSellingProducts(Array.isArray(data) ? data : []);
       } catch (error) {

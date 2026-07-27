@@ -119,6 +119,17 @@ const ProductModal = ({
   const images = getProductImages(product, placeholderImage);
   const options = product.options || {};
   const hasOptions = Object.keys(options).length > 0;
+  const sortedOptions = Object.entries(options).sort(
+    ([, firstGroup], [, secondGroup]) => {
+      const firstOrder = Number(firstGroup?.order_index);
+      const secondOrder = Number(secondGroup?.order_index);
+
+      return (
+        (Number.isFinite(firstOrder) ? firstOrder : Number.MAX_SAFE_INTEGER) -
+        (Number.isFinite(secondOrder) ? secondOrder : Number.MAX_SAFE_INTEGER)
+      );
+    },
+  );
 
   const modifierSurcharge = Object.values(selectedOptions)
     .flat()
@@ -267,7 +278,7 @@ const ProductModal = ({
                   console.log("Selected Options:", options) // Debugging line to check selected options
                 }
 
-                {Object.entries(options).map(([groupKey, groupData]) => (
+                {sortedOptions?.map(([groupKey, groupData]) => (
                   <div
                     key={groupKey}
                     className={

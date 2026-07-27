@@ -261,12 +261,12 @@ const LandingPage = ({ companyData }) => {
     });
   }, [products, selectedCategory, searchQuery]);
 
-  console.log(
-    "filteredProducts:------",
-    filteredProducts,
-    "selectedCategory:",
-    selectedCategory,
-  );
+  // console.log(
+  //   "filteredProducts:------",
+  //   filteredProducts,
+  //   "selectedCategory:",
+  //   selectedCategory,
+  // );
 
   const cartTotal = cartSubtotal; // delivery fee computed inside CheckoutModal via useDeliveryCharge
 
