@@ -29,7 +29,7 @@ const CheckoutModal = ({
     deliveryType: "delivery",
     pickupTime: "",
     orderNote: "",
-    paymentMethod: "cash",
+    paymentMethod: "cod",
   });
   const [mapLocation, setMapLocation] = useState(null);
   const [mapSearch, setMapSearch] = useState("");
@@ -473,7 +473,7 @@ const CheckoutModal = ({
           {/* Payment Method */}
           <div className="space-y-1.5">
             <label className="text-xs font-extrabold uppercase text-[#003660] block tracking-wide">
-              Payment Method
+              Payment Method 
             </label>
             <div className="grid grid-cols-2 gap-2">
               {[
