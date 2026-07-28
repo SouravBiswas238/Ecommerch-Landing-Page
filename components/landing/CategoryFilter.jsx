@@ -83,7 +83,7 @@ const CategoryFilter = ({
               <button
                 key={category.label}
                 type="button"
-                onClick={() => onSelect(category.value)}
+                onClick={() => onSelect(category.label)}
                 className="snap-start shrink-0 px-5 py-2.5 rounded-full text-sm font-semibold tracking-wide border cursor-pointer transition-all duration-300 whitespace-nowrap"
                 style={
                   isActive
