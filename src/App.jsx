@@ -4,6 +4,7 @@ import AnalyticsDashboard from "@/components/analytics/AnalyticsDashboard";
 import { getCompanyFromHost } from "@/lib/api";
 // import { trackVisit } from "@/lib/api";
 // import { getVisitorId, hasTrackedToday, markTrackedToday } from "@/lib/visitorId";
+import { updateMetaDescription } from "@/lib/updateMeta";
 
 const buildFallbackFavicon = (companyName = "Company") => {
   const initials =
@@ -90,6 +91,11 @@ export default function App() {
   if (new URLSearchParams(window.location.search).get("view") === "analytics") {
     return <AnalyticsDashboard companyId={companyData?.id} />;
   }
+  useEffect(() => {
+    const description = companyData?.attributes?.meta_description;
+
+    updateMetaDescription(description);
+  }, [companyData]);
 
   if (loading) {
     return (
