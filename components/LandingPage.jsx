@@ -487,6 +487,7 @@ const LandingPage = ({ companyData }) => {
                   {selectedCategory === "All"
                     ? "Signature Menu"
                     : selectedCategory}
+
                   <span
                     className="text-sm font-medium ml-2"
                     style={{ color: "var(--color-muted)" }}
