@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import LandingPage from "@/components/LandingPage";
+import AnalyticsDashboard from "@/components/analytics/AnalyticsDashboard";
 import { getCompanyFromHost } from "@/lib/api";
+// import { trackVisit } from "@/lib/api";
+// import { getVisitorId, hasTrackedToday, markTrackedToday } from "@/lib/visitorId";
 
 const buildFallbackFavicon = (companyName = "Company") => {
   const initials =
@@ -71,6 +74,22 @@ export default function App() {
       updateFavicon(companyData);
     }
   }, [companyData]);
+
+  // TODO: uncomment once the backend /storefront/track-visit endpoint is live.
+  // useEffect(() => {
+  //   if (!companyData?.id || hasTrackedToday()) return;
+  //
+  //   // Mark before the request settles so a down/missing endpoint doesn't
+  //   // retry on every reload for the rest of the day.
+  //   markTrackedToday();
+  //   trackVisit(companyData.id, getVisitorId()).catch((error) => {
+  //     console.error("Failed to track visit:", error.message);
+  //   });
+  // }, [companyData]);
+
+  if (new URLSearchParams(window.location.search).get("view") === "analytics") {
+    return <AnalyticsDashboard companyId={companyData?.id} />;
+  }
 
   if (loading) {
     return (
