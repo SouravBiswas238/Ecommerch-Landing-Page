@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import LandingPage from "@/components/LandingPage";
 import { getCompanyFromHost } from "@/lib/api";
+import { updateMetaDescription } from "@/lib/updateMeta";
 
 const buildFallbackFavicon = (companyName = "Company") => {
   const initials =
@@ -70,6 +71,12 @@ export default function App() {
     if (companyData) {
       updateFavicon(companyData);
     }
+  }, [companyData]);
+
+  useEffect(() => {
+    const description = companyData?.attributes?.meta_description;
+
+    updateMetaDescription(description);
   }, [companyData]);
 
   if (loading) {
