@@ -125,7 +125,7 @@ const CheckoutModal = ({
   };
 
   const handleMapSearch = async () => {
-    if (!mapSearch.trim() || !osmProvider) return;
+    if (!mapSearch?.trim() || !osmProvider) return;
     setMapSearching(true);
     try {
       const results = await osmProvider.search({ query: mapSearch });

@@ -237,7 +237,7 @@ const LandingPage = ({ companyData }) => {
   }, [companyData?.attributes?.categories]);
 
   const filteredProducts = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
+    const query = searchQuery?.trim().toLowerCase();
 
     return products.filter((product) => {
       const productCategory = product.attributes?.category?.trim();

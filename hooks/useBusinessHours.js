@@ -5,7 +5,7 @@ const parseTimeToMinutes = (timeString) => {
     return null;
   }
 
-  const normalizedTime = timeString.trim().toLowerCase();
+  const normalizedTime = timeString?.trim().toLowerCase();
 
   // Supports: "7:30am", "7:30 am", "5:00pm"
   const twelveHourMatch = normalizedTime.match(/^(\d{1,2}):(\d{2})\s*(am|pm)$/);

@@ -157,7 +157,7 @@ const ProductModal = ({
 
   const handleAdd = () => {
     if (!validate()) return;
-    onAddToCart(product, quantity, selectedOptions, productNote.trim());
+    onAddToCart(product, quantity, selectedOptions, productNote?.trim());
     onClose();
   };
 
