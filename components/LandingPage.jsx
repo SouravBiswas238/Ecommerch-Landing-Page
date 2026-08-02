@@ -312,7 +312,11 @@ const LandingPage = ({ companyData }) => {
       customer_name: checkoutForm.name,
       phone_number: checkoutForm.phone,
       delivery_type: checkoutForm.deliveryType,
-      payment_method: checkoutForm.paymentMethod,
+      order_source: "web",
+      payment_method:
+        checkoutForm.paymentMethod === "cash"
+          ? "cod"
+          : checkoutForm.paymentMethod,
       attributes: {
         pickup_time: checkoutForm.pickupTime || "",
         order_note: checkoutForm.orderNote || "",
@@ -352,6 +356,9 @@ const LandingPage = ({ companyData }) => {
       })),
       company: Number(companyData?.id),
     };
+
+    // console.log("Checkout payload:", payload);
+
     try {
       const orderData = await createOrder(payload);
       const orderTime = new Date().toLocaleTimeString([], {
