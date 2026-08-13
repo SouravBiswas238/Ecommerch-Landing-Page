@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import LandingPage from "@/components/LandingPage";
 import CateringBookingForm from "@/components/appointment/CateringBookingForm";
 import { getCompanyFromHost } from "@/lib/api";
+import { updateMetaDescription } from "@/lib/updateMeta";
 
 const buildFallbackFavicon = (companyName = "Company") => {
   const initials =
@@ -91,6 +92,11 @@ export default function App() {
   if (isAppointmentRoute) {
     return <CateringBookingForm />;
   }
+  useEffect(() => {
+    const description = companyData?.attributes?.meta_description;
+
+    updateMetaDescription(description);
+  }, [companyData]);
 
   if (loading) {
     return (
