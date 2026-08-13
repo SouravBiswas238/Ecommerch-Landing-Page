@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import LandingPage from "@/components/LandingPage";
 import AnalyticsDashboard from "@/components/analytics/AnalyticsDashboard";
+import CateringBookingForm from "@/components/appointment/CateringBookingForm";
 import { getCompanyFromHost } from "@/lib/api";
 // import { trackVisit } from "@/lib/api";
 // import { getVisitorId, hasTrackedToday, markTrackedToday } from "@/lib/visitorId";
@@ -49,6 +50,18 @@ const updateFavicon = (companyData) => {
 export default function App() {
   const [companyData, setCompanyData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [currentPath, setCurrentPath] = useState(
+    typeof window !== "undefined" ? window.location.pathname : "/",
+  );
+
+  useEffect(() => {
+    const syncPath = () => setCurrentPath(window.location.pathname);
+
+    syncPath();
+    window.addEventListener("popstate", syncPath);
+
+    return () => window.removeEventListener("popstate", syncPath);
+  }, []);
 
   useEffect(() => {
     async function fetchCompany() {
@@ -90,6 +103,11 @@ export default function App() {
 
   if (new URLSearchParams(window.location.search).get("view") === "analytics") {
     return <AnalyticsDashboard companyId={companyData?.id} />;
+  const isAppointmentRoute =
+    currentPath === "/appointment" || currentPath.endsWith("/appointment");
+
+  if (isAppointmentRoute) {
+    return <CateringBookingForm />;
   }
   useEffect(() => {
     const description = companyData?.attributes?.meta_description;

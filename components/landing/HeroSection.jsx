@@ -8,6 +8,13 @@ const HeroSection = ({ companyId, onProductClick }) => {
   const [loading, setLoading] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
 
+  const handleOpenAppointmentPage = () => {
+    if (typeof window === "undefined") return;
+
+    const url = new URL("/appointment", window.location.origin).toString();
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
   useEffect(() => {
     const getTopOrderedProducts = async () => {
       try {
@@ -90,9 +97,25 @@ const HeroSection = ({ companyId, onProductClick }) => {
               Order Food Online
             </span>
 
-            <h2 className="text-2xl md:text-[40px] font-extrabold leading-tight font-['Nunito',sans-serif] mb-2">
+            <h2 className="text-xl md:text-[40px] font-extrabold leading-tight font-['Nunito',sans-serif] mb-2">
               It's time to have a good day with your favorite meals in one place
             </h2>
+
+            <div className="mt-5 flex flex-wrap justify-center md:justify-start gap-3">
+              <button
+                type="button"
+                onClick={handleOpenAppointmentPage}
+                className="inline-flex items-center justify-center rounded-full md:px-6 md:py-3 px-3 py-1.5 text-sm font-bold shadow-lg transition hover:scale-[1.02] hover:opacity-95"
+                style={{
+                  background: "var(--color-accent)",
+                  color: "var(--color-accent-text)",
+                }}
+              >
+                <span  className="inline-flex items-center rounded-full text-xs font-bold uppercase tracking-wider">
+                  Book an Appointment
+                </span>
+              </button>
+            </div>
           </div>
 
           {/* Top selling product slider */}
