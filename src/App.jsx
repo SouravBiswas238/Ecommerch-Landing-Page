@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import LandingPage from "@/components/LandingPage";
+import CateringBookingForm from "@/components/appointment/CateringBookingForm";
 import { getCompanyFromHost } from "@/lib/api";
 
 const buildFallbackFavicon = (companyName = "Company") => {
@@ -45,6 +46,18 @@ const updateFavicon = (companyData) => {
 export default function App() {
   const [companyData, setCompanyData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [currentPath, setCurrentPath] = useState(
+    typeof window !== "undefined" ? window.location.pathname : "/",
+  );
+
+  useEffect(() => {
+    const syncPath = () => setCurrentPath(window.location.pathname);
+
+    syncPath();
+    window.addEventListener("popstate", syncPath);
+
+    return () => window.removeEventListener("popstate", syncPath);
+  }, []);
 
   useEffect(() => {
     async function fetchCompany() {
@@ -71,6 +84,13 @@ export default function App() {
       updateFavicon(companyData);
     }
   }, [companyData]);
+
+  const isAppointmentRoute =
+    currentPath === "/appointment" || currentPath.endsWith("/appointment");
+
+  if (isAppointmentRoute) {
+    return <CateringBookingForm />;
+  }
 
   if (loading) {
     return (
