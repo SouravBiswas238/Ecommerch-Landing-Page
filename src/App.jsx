@@ -89,6 +89,12 @@ export default function App() {
     }
   }, [companyData]);
 
+  useEffect(() => {
+    const description = companyData?.attributes?.meta_description;
+
+    updateMetaDescription(description);
+  }, [companyData]);
+
   // TODO: uncomment once the backend /storefront/track-visit endpoint is live.
   // useEffect(() => {
   //   if (!companyData?.id || hasTrackedToday()) return;
@@ -103,17 +109,14 @@ export default function App() {
 
   if (new URLSearchParams(window.location.search).get("view") === "analytics") {
     return <AnalyticsDashboard companyId={companyData?.id} />;
+  }
+
   const isAppointmentRoute =
     currentPath === "/appointment" || currentPath.endsWith("/appointment");
 
   if (isAppointmentRoute) {
     return <CateringBookingForm />;
   }
-  useEffect(() => {
-    const description = companyData?.attributes?.meta_description;
-
-    updateMetaDescription(description);
-  }, [companyData]);
 
   if (loading) {
     return (

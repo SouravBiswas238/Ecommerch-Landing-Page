@@ -3,7 +3,16 @@
     "allow": [
       "Bash(git -C /Users/sourav12/Office/Aise/Restaurant_Landing ls-files)",
       "Bash(git -C /Users/sourav12/Office/Aise/Restaurant_Landing status --short)",
-      "Bash(git -C /Users/sourav12/Office/Aise/Restaurant_Landing rm -r --cached dist)"
+      "Bash(git -C /Users/sourav12/Office/Aise/Restaurant_Landing rm -r --cached dist)",
+      "Bash(git check-ignore *)",
+      "Bash(npm run *)",
+      "Read(//Users/macbook/Library/Caches/ms-playwright/**)",
+      "Bash(mkdir -p /tmp/pwtest2)",
+      "Read(//tmp/**)",
+      "Bash(npm init *)",
+      "Bash(npm install *)",
+      "Read(//private/tmp/pwtest2/**)",
+      "Bash(node check.mjs)"
     ]
   }
 }
