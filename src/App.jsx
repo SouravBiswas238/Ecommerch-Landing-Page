@@ -50,6 +50,19 @@ const updateFavicon = (companyData) => {
 export default function App() {
   const [companyData, setCompanyData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [currentPath, setCurrentPath] = useState(
+    typeof window !== "undefined" ? window.location.pathname : "/",
+  );
+
+  useEffect(() => {
+    const syncPath = () => setCurrentPath(window.location.pathname);
+
+    syncPath();
+    window.addEventListener("popstate", syncPath);
+
+    return () => window.removeEventListener("popstate", syncPath);
+  }, []);
+
   useEffect(() => {
     async function fetchCompany() {
       try {
