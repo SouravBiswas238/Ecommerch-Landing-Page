@@ -51,10 +51,10 @@ const HeroSection = ({ companyId, onProductClick, onOpenCateringModal }) => {
   const currentProduct = topSellingProducts[currentSlide];
   const currentProductImage =
     typeof currentProduct?.image_url === "string" &&
-    currentProduct.image_url.trim() !== ""
+    currentProduct.image_url?.trim() !== ""
       ? currentProduct.image_url
       : typeof currentProduct?.image === "string" &&
-          currentProduct.image.trim() !== ""
+          currentProduct.image?.trim() !== ""
         ? currentProduct.image
         : null;
 

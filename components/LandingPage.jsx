@@ -55,6 +55,8 @@ const LandingPage = ({ companyData }) => {
   // ── Search & filter ──
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const isLocalhost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+  const baseUrl = isLocalhost ? 'https://dev.aisalesteams.com' : window.location.origin;
 
   // console.log("LandingPage companyData:", companyData?.attributes?.placeholder_image);
 
@@ -247,7 +249,7 @@ const LandingPage = ({ companyData }) => {
   }, [companyData?.attributes?.categories]);
 
   const filteredProducts = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
+    const query = searchQuery?.trim().toLowerCase();
 
     return products.filter((product) => {
       const productCategory = product.attributes?.category?.trim();
@@ -392,6 +394,10 @@ const LandingPage = ({ companyData }) => {
       };
 
       setPlacedOrderDetails(details);
+      if (orderData?.id && orderData?.payment_method !== 'cod') {
+        window.location.href = `${baseUrl}/ecommerce/checkout/${orderData.id}`;
+        return;
+      }
 
       if (orderData?.uuid) {
         const newOrderObj = {

@@ -36,7 +36,7 @@ const cartReducer = (state, action) => {
       const { product, quantity, selectedOptions, productNote = "" } = action;
       const baseCustomKey = generateCustomKey(product.id, selectedOptions);
       const customKey = `${baseCustomKey}-note-${encodeURIComponent(
-        productNote.trim(),
+        productNote?.trim(),
       )}`;
 
       const modifierSurcharge = Object.values(selectedOptions)
@@ -57,7 +57,7 @@ const cartReducer = (state, action) => {
         updated[idx] = {
           ...updated[idx],
           quantity: updated[idx].quantity + quantity,
-          productNote: productNote.trim(),
+          productNote: productNote?.trim(),
         };
         return updated;
       }
@@ -68,7 +68,7 @@ const cartReducer = (state, action) => {
           product: enrichedProduct,
           quantity,
           selectedOptions,
-          productNote: productNote.trim(),
+          productNote: productNote?.trim(),
         },
       ];
     }

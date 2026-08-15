@@ -12,6 +12,9 @@
 
 # testing
 /coverage
+/dist
+dist*
+dist
 
 # next.js
 /.next/
@@ -20,6 +23,7 @@
 # production
 /build
 /dist
+/dist/index.html
 
 # misc
 .DS_Store
@@ -33,6 +37,10 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+.claude
+.zed
+
+
 
 # vercel
 .vercel

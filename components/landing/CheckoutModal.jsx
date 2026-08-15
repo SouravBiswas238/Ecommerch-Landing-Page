@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, DollarSign, CreditCard } from "lucide-react";
+import { X, DollarSign, CreditCard, RefreshCw } from "lucide-react";
 import { OpenStreetMapProvider } from "leaflet-geosearch";
 import MapPicker from "@/components/ui/MapPicker";
 import { useDeliveryCharge } from "@/hooks/useDeliveryCharge";
@@ -29,13 +29,14 @@ const CheckoutModal = ({
     deliveryType: "delivery",
     pickupTime: "",
     orderNote: "",
-    paymentMethod: "cash",
+    paymentMethod: "cod",
   });
   const [mapLocation, setMapLocation] = useState(null);
   const [mapSearch, setMapSearch] = useState("");
   const [mapSearching, setMapSearching] = useState(false);
   const [geoLoading, setGeoLoading] = useState(false);
   const [formErrors, setFormErrors] = useState({});
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
 
   const [osmProvider, setOsmProvider] = useState(null);
   useEffect(() => {
@@ -124,7 +125,7 @@ const CheckoutModal = ({
   };
 
   const handleMapSearch = async () => {
-    if (!mapSearch.trim() || !osmProvider) return;
+    if (!mapSearch?.trim() || !osmProvider) return;
     setMapSearching(true);
     try {
       const results = await osmProvider.search({ query: mapSearch });
@@ -143,6 +144,8 @@ const CheckoutModal = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (isPlacingOrder) return;
 
     // Check business hours again before placing the order
     if (onValidateBusinessHours && !onValidateBusinessHours()) {
@@ -166,13 +169,18 @@ const CheckoutModal = ({
       return;
     }
     setFormErrors({});
-    await onSubmit(
-      checkoutForm,
-      mapLocation,
-      cartTotal,
-      cartSubtotal,
-      deliveryFee,
-    );
+    setIsPlacingOrder(true);
+    try {
+      await onSubmit(
+        checkoutForm,
+        mapLocation,
+        cartTotal,
+        cartSubtotal,
+        deliveryFee,
+      );
+    } finally {
+      setIsPlacingOrder(false);
+    }
   };
 
   return (
@@ -473,20 +481,12 @@ const CheckoutModal = ({
           {/* Payment Method */}
           <div className="space-y-1.5">
             <label className="text-xs font-extrabold uppercase text-[#003660] block tracking-wide">
-              Payment Method
+              Payment Method 
             </label>
             <div className="grid grid-cols-2 gap-2">
               {[
-                {
-                  key: "cash",
-                  icon: <DollarSign className="w-4 h-4" />,
-                  label: "Cash",
-                },
-                {
-                  key: "card",
-                  icon: <CreditCard className="w-4 h-4" />,
-                  label: "Card",
-                },
+                { key: "cod", icon: <DollarSign className="w-4 h-4" />, label: "Cash" },
+                { key: "powertranz", icon: <CreditCard className="w-4 h-4" />, label: "Card" },
               ].map((opt) => (
                 <div
                   key={opt.key}
@@ -579,13 +579,15 @@ const CheckoutModal = ({
           {!deliveryChargeLoading && !deliveryError && !minimumOrderError && (
             <button
               type="submit"
-              className="w-full py-3.5 rounded-xl text-xs font-bold transition-all cursor-pointer uppercase tracking-wider"
+              disabled={isPlacingOrder}
+              className="w-full py-3.5 rounded-xl text-xs font-bold transition-all cursor-pointer uppercase tracking-wider disabled:cursor-not-allowed disabled:opacity-70 flex items-center justify-center gap-2"
               style={{
                 background: "var(--color-primary)",
                 color: "var(--color-primary-text)",
                 boxShadow: "0 4px 12px rgb(var(--color-primary-rgb) / 0.15)",
               }}
               onMouseEnter={(e) => {
+                if (isPlacingOrder) return;
                 e.currentTarget.style.background = "var(--color-primary-hover)";
                 e.currentTarget.style.boxShadow =
                   "0 8px 20px rgb(var(--color-primary-rgb) / 0.25)";
@@ -596,7 +598,10 @@ const CheckoutModal = ({
                   "0 4px 12px rgb(var(--color-primary-rgb) / 0.15)";
               }}
             >
-              Place Order (${cartTotal.toLocaleString()})
+              {isPlacingOrder && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
+              {isPlacingOrder
+                ? "Placing Order…"
+                : `Place Order ($${cartTotal.toLocaleString()})`}
             </button>
           )}
         </form>
