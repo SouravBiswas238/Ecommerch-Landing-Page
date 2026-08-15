@@ -1,5 +1,3 @@
-
-
 // ─── Data ──────────────────────────────────────────────────────────────────
 
 import { useCateringForm } from "@/hooks/useCateringForm";
@@ -84,7 +82,7 @@ const inputClass = (hasError) =>
 
 // ─── Main Component ────────────────────────────────────────────────────────
 
-export default function CateringBookingForm() {
+export default function CateringBookingForm({ companyId }) {
   const {
     form,
     errors,
@@ -93,7 +91,7 @@ export default function CateringBookingForm() {
     handleChange,
     handleSubmit,
     resetForm,
-  } = useCateringForm();
+  } = useCateringForm(companyId);
 
   // ── Success screen ──────────────────────────────────────────────────────
   if (status === "success") {
@@ -121,13 +119,22 @@ export default function CateringBookingForm() {
             <span className="font-semibold">1–2 business days</span> to confirm
             the details.
           </p>
-          <button
-            onClick={resetForm}
-            className="mt-7 px-6 py-2.5 rounded-lg text-white text-sm font-semibold transition hover:opacity-90"
-            style={{ backgroundColor: "#94C15B" }}
-          >
-            Submit Another Request
-          </button>
+          <div className="mt-7 flex flex-col sm:flex-row gap-3 justify-center">
+            <button
+              onClick={resetForm}
+              className="px-6 py-2.5 rounded-lg text-white text-sm font-semibold transition hover:opacity-90"
+              style={{ backgroundColor: "#94C15B" }}
+            >
+              Submit Another Request
+            </button>
+            <button
+              type="button"
+              onClick={() => (window.location.href = "/")}
+              className="px-6 py-2.5 rounded-lg border border-gray-300 text-gray-700 text-sm font-semibold transition hover:bg-gray-50"
+            >
+              Back to Home
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -243,6 +250,17 @@ export default function CateringBookingForm() {
                 onChange={handleChange}
                 min={today()}
                 className={inputClass(!!errors.eventDate)}
+              />
+            </Field>
+
+            {/* Preferred Time */}
+            <Field label="Preferred Time" required error={errors.preferredTime}>
+              <input
+                type="time"
+                name="preferredTime"
+                value={form.preferredTime}
+                onChange={handleChange}
+                className={inputClass(!!errors.preferredTime)}
               />
             </Field>
 

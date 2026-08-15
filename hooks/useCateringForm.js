@@ -1,23 +1,16 @@
 import { useState } from "react";
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Replace this with your real API endpoint
-// ─────────────────────────────────────────────────────────────────────────────
-const API_ENDPOINT = "https://your-api.com/catering-request";
+import { createPublicAppointment } from "@/lib/api";
 
 const INITIAL_STATE = {
-  // Contact
   fullName: "",
   email: "",
   phone: "",
-  // Event
   eventType: "",
   eventDate: "",
+  preferredTime: "15:30",
   eventLocation: "",
   guestCount: "",
-  // Service
   serviceStyle: "",
-  // Extra
   notes: "",
 };
 
@@ -27,10 +20,29 @@ const REQUIRED_FIELDS = [
   "phone",
   "eventType",
   "eventDate",
+  "preferredTime",
   "eventLocation",
   "guestCount",
   "serviceStyle",
 ];
+
+const EVENT_TYPE_LABELS = {
+  wedding: "Wedding",
+  birthday: "Birthday Party",
+  corporate: "Corporate Event",
+  repast: "Repast",
+  baby_shower: "Baby Shower",
+  bridal_shower: "Bridal Shower",
+  graduation: "Graduation Party",
+  anniversary: "Anniversary",
+  holiday: "Holiday Gathering",
+  other: "Other",
+};
+
+const SERVICE_STYLE_LABELS = {
+  buffet: "Buffet",
+  packaged: "Packaged Catering",
+};
 
 function validate(form) {
   const errors = {};
@@ -49,7 +61,10 @@ function validate(form) {
     errors.phone = "Please enter a valid phone number.";
   }
 
-  if (form.guestCount && (isNaN(form.guestCount) || Number(form.guestCount) < 1)) {
+  if (
+    form.guestCount &&
+    (isNaN(form.guestCount) || Number(form.guestCount) < 1)
+  ) {
     errors.guestCount = "Please enter a valid number of guests.";
   }
 
@@ -59,19 +74,23 @@ function validate(form) {
     errors.eventDate = "Event date must be today or in the future.";
   }
 
+  if (form.preferredTime && !/^\d{2}:\d{2}$/.test(form.preferredTime)) {
+    errors.preferredTime = "Please choose a valid time.";
+  }
+
   return errors;
 }
 
-export function useCateringForm() {
+export function useCateringForm(companyId) {
   const [form, setForm] = useState(INITIAL_STATE);
   const [errors, setErrors] = useState({});
-  const [status, setStatus] = useState("idle"); // "idle" | "submitting" | "success" | "error"
+  const [status, setStatus] = useState("idle");
   const [serverError, setServerError] = useState("");
 
   function handleChange(e) {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
-    // Clear error on change
+
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: undefined }));
     }
@@ -83,9 +102,18 @@ export function useCateringForm() {
     const validationErrors = validate(form);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      // Scroll to first error
       const firstErrorField = document.querySelector("[data-error='true']");
-      if (firstErrorField) firstErrorField.scrollIntoView({ behavior: "smooth", block: "center" });
+      if (firstErrorField) {
+        firstErrorField.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+      return;
+    }
+
+    if (!companyId) {
+      setStatus("error");
+      setServerError(
+        "Company information is unavailable right now. Please refresh the page and try again.",
+      );
       return;
     }
 
@@ -93,27 +121,38 @@ export function useCateringForm() {
     setServerError("");
 
     try {
-      const response = await fetch(API_ENDPOINT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...form,
-          guestCount: Number(form.guestCount),
-          submittedAt: new Date().toISOString(),
-        }),
-      });
+      const appointmentDatetime = new Date(
+        `${form.eventDate}T${form.preferredTime}:00`,
+      ).toISOString();
 
-      if (!response.ok) {
-        throw new Error(`Server responded with status ${response.status}`);
-      }
+      const payload = {
+        name: form.fullName,
+        email: form.email,
+        phone_number: form.phone,
+        appointment_datetime: appointmentDatetime,
+        customer_appointment_notes: form.notes || "",
+        event: {
+          company: Number(companyId),
+          event_type: EVENT_TYPE_LABELS[form.eventType] || form.eventType,
+          number_of_attendees: Number(form.guestCount),
+          event_address: form.eventLocation,
+          service_style:
+            SERVICE_STYLE_LABELS[form.serviceStyle] || form.serviceStyle,
+        },
+      };
+
+      await createPublicAppointment(payload);
 
       setStatus("success");
       setForm(INITIAL_STATE);
       setErrors({});
     } catch (err) {
+      console.error("Public appointment submission failed:", err);
       setStatus("error");
       setServerError(
-        "Something went wrong submitting your request. Please try again or contact us directly."
+        err?.response?.data?.detail ||
+          err?.response?.data?.message ||
+          "Something went wrong submitting your request. Please try again or contact us directly.",
       );
     }
   }
@@ -125,5 +164,13 @@ export function useCateringForm() {
     setServerError("");
   }
 
-  return { form, errors, status, serverError, handleChange, handleSubmit, resetForm };
+  return {
+    form,
+    errors,
+    status,
+    serverError,
+    handleChange,
+    handleSubmit,
+    resetForm,
+  };
 }

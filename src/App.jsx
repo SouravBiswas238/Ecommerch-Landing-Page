@@ -115,7 +115,15 @@ export default function App() {
     currentPath === "/appointment" || currentPath.endsWith("/appointment");
 
   if (isAppointmentRoute) {
-    return <CateringBookingForm />;
+    if (loading && !companyData) {
+      return (
+        <div className="flex h-screen w-full items-center justify-center bg-[#FDF8F6]">
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-t-[#5F359F] border-[#5F359F]/20"></div>
+        </div>
+      );
+    }
+
+    return <CateringBookingForm companyId={companyData?.id} />;
   }
 
   if (loading) {
