@@ -90,6 +90,16 @@ const LandingPage = ({ companyData }) => {
   const [trackDrawerOpen, setTrackDrawerOpen] = useState(false);
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
 
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+
+    document.body.style.overflow = bookingModalOpen ? "hidden" : "";
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [bookingModalOpen]);
+
   // ── Product modal ──
   const [selectedProduct, setSelectedProduct] = useState(null);
 
