@@ -23,6 +23,7 @@ import CartDrawer from "@/components/landing/CartDrawer";
 import OrderSuccessModal from "@/components/landing/OrderSuccessModal";
 import TrackOrderDrawer from "@/components/landing/TrackOrderDrawer";
 import FooterSection from "@/components/landing/FooterSection";
+import CateringBookingForm from "@/components/appointment/CateringBookingForm";
 
 // Product
 import ProductModal from "@/components/product/ProductModal";
@@ -87,6 +88,7 @@ const LandingPage = ({ companyData }) => {
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [trackDrawerOpen, setTrackDrawerOpen] = useState(false);
+  const [bookingModalOpen, setBookingModalOpen] = useState(false);
 
   // ── Product modal ──
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -433,6 +435,7 @@ const LandingPage = ({ companyData }) => {
           onProductClick={(topSellingProduct) =>
             setSelectedProduct(resolveTopSellingProduct(topSellingProduct))
           }
+          onOpenCateringModal={() => setBookingModalOpen(true)}
         />
 
         {/* Mobile Search */}
@@ -610,6 +613,26 @@ const LandingPage = ({ companyData }) => {
             savedOrders={savedOrders}
             onClose={() => setTrackDrawerOpen(false)}
           />
+        )}
+
+        {bookingModalOpen && (
+          <div className="fixed inset-0 z-60 bg-black/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6">
+            <div className="relative w-full max-w-3xl max-h-[92vh] overflow-y-auto rounded-[28px] bg-white shadow-2xl border border-slate-200">
+              <button
+                type="button"
+                onClick={() => setBookingModalOpen(false)}
+                className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-slate-900/80 text-lg font-semibold text-white shadow-md transition hover:bg-slate-800"
+                aria-label="Close catering booking"
+              >
+                ×
+              </button>
+              <CateringBookingForm
+                companyId={companyData?.id}
+                isModal
+                onClose={() => setBookingModalOpen(false)}
+              />
+            </div>
+          </div>
         )}
 
         {/* Footer */}

@@ -2,17 +2,14 @@ import { useEffect, useState } from "react";
 import { Sparkles } from "lucide-react";
 import { fetchTopOrderedProducts } from "@/lib/api";
 
-const HeroSection = ({ companyId, onProductClick }) => {
+const HeroSection = ({ companyId, onProductClick, onOpenCateringModal }) => {
   const [topSellingProducts, setTopSellingProducts] = useState([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [loading, setLoading] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
 
-  const handleOpenAppointmentPage = () => {
-    if (typeof window === "undefined") return;
-
-    const url = new URL("/appointment", window.location.origin).toString();
-    window.open(url, "_blank", "noopener,noreferrer");
+  const handleOpenAppointmentModal = () => {
+    onOpenCateringModal?.();
   };
 
   useEffect(() => {
@@ -104,14 +101,14 @@ const HeroSection = ({ companyId, onProductClick }) => {
             <div className="mt-5 flex flex-wrap justify-center md:justify-start gap-3">
               <button
                 type="button"
-                onClick={handleOpenAppointmentPage}
+                onClick={handleOpenAppointmentModal}
                 className="inline-flex items-center justify-center rounded-full md:px-6 md:py-3 px-3 py-1.5 text-sm font-bold shadow-lg transition hover:scale-[1.02] hover:opacity-95"
                 style={{
                   background: "var(--color-accent)",
                   color: "var(--color-accent-text)",
                 }}
               >
-                <span  className="inline-flex items-center rounded-full text-xs font-bold uppercase tracking-wider">
+                <span className="inline-flex items-center rounded-full text-xs font-bold uppercase tracking-wider">
                   Booking Catering
                 </span>
               </button>
