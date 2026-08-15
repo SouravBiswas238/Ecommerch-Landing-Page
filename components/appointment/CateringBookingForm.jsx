@@ -46,7 +46,7 @@ function SectionHeading({ step, title, subtitle }) {
   return (
     <div className="flex items-start gap-3 mb-5">
       <span
-        className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold mt-0.5"
+        className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold mt-0.5"
         style={{ backgroundColor: "#5C9895" }}
       >
         {step}
@@ -84,7 +84,11 @@ const inputClass = (hasError) =>
 
 // ─── Main Component ────────────────────────────────────────────────────────
 
-export default function CateringBookingForm({ companyId }) {
+export default function CateringBookingForm({
+  companyId,
+  isModal = false,
+  onClose,
+}) {
   const { toasts, showToast } = useToast();
   const {
     form,
@@ -100,7 +104,11 @@ export default function CateringBookingForm({ companyId }) {
   if (status === "success") {
     return (
       <div
-        className="min-h-screen flex items-center justify-center px-4 py-16"
+        className={
+          isModal
+            ? "flex items-center justify-center px-4 py-10"
+            : "min-h-screen flex items-center justify-center px-4 py-16"
+        }
         style={{ backgroundColor: "#F5FAF9" }}
       >
         <div className="bg-white rounded-2xl shadow-lg p-10 max-w-md w-full text-center">
@@ -132,10 +140,16 @@ export default function CateringBookingForm({ companyId }) {
             </button>
             <button
               type="button"
-              onClick={() => (window.location.href = "/")}
+              onClick={() => {
+                if (isModal && onClose) {
+                  onClose();
+                  return;
+                }
+                window.location.href = "/";
+              }}
               className="px-6 py-2.5 rounded-lg border border-gray-300 text-gray-700 text-sm font-semibold transition hover:bg-gray-50"
             >
-              Back to Home
+              {isModal ? "Close" : "Back to Home"}
             </button>
           </div>
         </div>
@@ -148,7 +162,7 @@ export default function CateringBookingForm({ companyId }) {
     <>
       <ToastHub toasts={toasts} />
       <div
-        className="min-h-screen py-12 px-4"
+        className={isModal ? "py-8 px-4 sm:px-6" : "min-h-screen py-12 px-4"}
         style={{ backgroundColor: "#F5FAF9" }}
       >
         {/* Header Banner */}
