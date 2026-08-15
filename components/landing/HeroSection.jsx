@@ -112,7 +112,7 @@ const HeroSection = ({ companyId, onProductClick }) => {
                 }}
               >
                 <span  className="inline-flex items-center rounded-full text-xs font-bold uppercase tracking-wider">
-                  Book an Appointment
+                  Booking Catering
                 </span>
               </button>
             </div>
