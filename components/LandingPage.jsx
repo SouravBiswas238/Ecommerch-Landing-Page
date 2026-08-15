@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { X } from "lucide-react";
 
 // Hooks
 import { useCart } from "@/hooks/useCart";
@@ -55,8 +56,12 @@ const LandingPage = ({ companyData }) => {
   // ── Search & filter ──
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
-  const isLocalhost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
-  const baseUrl = isLocalhost ? 'https://dev.aisalesteams.com' : window.location.origin;
+  const isLocalhost = ["localhost", "127.0.0.1"].includes(
+    window.location.hostname,
+  );
+  const baseUrl = isLocalhost
+    ? "https://dev.aisalesteams.com"
+    : window.location.origin;
 
   // console.log("LandingPage companyData:", companyData?.attributes?.placeholder_image);
 
@@ -394,7 +399,7 @@ const LandingPage = ({ companyData }) => {
       };
 
       setPlacedOrderDetails(details);
-      if (orderData?.id && orderData?.payment_method !== 'cod') {
+      if (orderData?.id && orderData?.payment_method !== "cod") {
         window.location.href = `${baseUrl}/ecommerce/checkout/${orderData.id}`;
         return;
       }
@@ -638,10 +643,10 @@ const LandingPage = ({ companyData }) => {
                 <button
                   type="button"
                   onClick={() => setBookingModalOpen(false)}
-                  className="flex h-11 w-11 items-center justify-center rounded-full border border-red-500 bg-white/95 text-2xl font-semibold text-slate-700 shadow-lg transition hover:bg-white hover:text-slate-900"
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-red-500 bg-white/95 text-slate-700 shadow-lg transition hover:bg-white hover:text-slate-900"
                   aria-label="Close catering booking"
                 >
-                  ×
+                  <X className="h-5 w-5" strokeWidth={2.5} />
                 </button>
               </div>
 
