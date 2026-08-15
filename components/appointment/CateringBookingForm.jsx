@@ -162,7 +162,7 @@ export default function CateringBookingForm({
     <>
       <ToastHub toasts={toasts} />
       <div
-        className={isModal ? "py-8 px-4 sm:px-6" : "min-h-screen py-12 px-4"}
+        className={isModal ? "py-3 px-4 sm:px-6" : "min-h-screen py-5 px-4"}
         style={{ backgroundColor: "#F5FAF9" }}
       >
         {/* Header Banner */}

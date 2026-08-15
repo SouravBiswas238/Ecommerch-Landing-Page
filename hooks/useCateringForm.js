@@ -130,6 +130,7 @@ export function useCateringForm(companyId, showToast = () => {}) {
       ).toISOString();
 
       const payload = {
+        company: Number(companyId),
         name: form.fullName,
         email: form.email,
         phone_number: form.phone,

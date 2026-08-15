@@ -616,16 +616,19 @@ const LandingPage = ({ companyData }) => {
         )}
 
         {bookingModalOpen && (
-          <div className="fixed inset-0 z-60 bg-black/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6">
-            <div className="relative w-full max-w-3xl max-h-[92vh] overflow-y-auto rounded-[28px] bg-white shadow-2xl border border-slate-200">
-              <button
-                type="button"
-                onClick={() => setBookingModalOpen(false)}
-                className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-slate-900/80 text-lg font-semibold text-white shadow-md transition hover:bg-slate-800"
-                aria-label="Close catering booking"
-              >
-                ×
-              </button>
+          <div className="fixed inset-0 z-60 overflow-y-auto bg-[#F5FAF9]">
+            <div className="relative min-h-screen">
+              <div className="sticky top-0 z-20 flex justify-end px-4 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setBookingModalOpen(false)}
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-red-500 bg-white/95 text-2xl font-semibold text-slate-700 shadow-lg transition hover:bg-white hover:text-slate-900"
+                  aria-label="Close catering booking"
+                >
+                  ×
+                </button>
+              </div>
+
               <CateringBookingForm
                 companyId={companyData?.id}
                 isModal
