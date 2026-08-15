@@ -81,7 +81,7 @@ function validate(form) {
   return errors;
 }
 
-export function useCateringForm(companyId) {
+export function useCateringForm(companyId, showToast = () => {}) {
   const [form, setForm] = useState(INITIAL_STATE);
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState("idle");
@@ -102,6 +102,10 @@ export function useCateringForm(companyId) {
     const validationErrors = validate(form);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
+      showToast(
+        "Please complete all required fields before submitting.",
+        "warning",
+      );
       const firstErrorField = document.querySelector("[data-error='true']");
       if (firstErrorField) {
         firstErrorField.scrollIntoView({ behavior: "smooth", block: "center" });
