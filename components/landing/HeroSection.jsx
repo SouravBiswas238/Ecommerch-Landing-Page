@@ -109,7 +109,7 @@ const HeroSection = ({ companyId, onProductClick, onOpenCateringModal }) => {
                 }}
               >
                 <span className="inline-flex items-center rounded-full text-xs font-bold uppercase tracking-wider">
-                  Booking Catering
+                  Book Us For Catering
                 </span>
               </button>
             </div>
