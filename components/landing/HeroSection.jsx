@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Sparkles } from "lucide-react";
+import { Sparkles, UtensilsCrossed } from "lucide-react";
 import { fetchTopOrderedProducts } from "@/lib/api";
 
 const HeroSection = ({ companyId, onProductClick, onOpenCateringModal }) => {
@@ -83,35 +83,35 @@ const HeroSection = ({ companyId, onProductClick, onOpenCateringModal }) => {
 
         <div className="relative z-10 px-6 py-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="text-center md:text-left max-w-xl">
-            <span
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3"
-              style={{
-                background: "var(--color-accent)",
-                color: "var(--color-accent-text)",
-              }}
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              Order Food Online
-            </span>
-
             <h2 className="text-xl md:text-[40px] font-extrabold leading-tight font-['Nunito',sans-serif] mb-2">
               It's time to have a good day with your favorite meals in one place
             </h2>
-
             <div className="mt-5 flex flex-wrap justify-center md:justify-start gap-3">
               <button
                 type="button"
                 onClick={handleOpenAppointmentModal}
-                className="inline-flex items-center justify-center rounded-full md:px-6 md:py-3 px-3 py-1.5 text-sm font-bold shadow-lg transition hover:scale-[1.02] hover:opacity-95"
+                className="inline-flex items-center justify-center gap-2 rounded-full md:px-6 md:py-3 px-3 py-1.5 text-sm font-bold shadow-lg transition hover:scale-[1.02] hover:opacity-95"
                 style={{
                   background: "var(--color-accent)",
                   color: "var(--color-accent-text)",
+                  animation: "heartbeat 2.5s ease-in-out infinite",
                 }}
               >
+                <UtensilsCrossed className="w-4 h-4" />
                 <span className="inline-flex items-center rounded-full text-xs font-bold uppercase tracking-wider">
-                  Book Us For Catering
+                  Good Day Catering Services
                 </span>
               </button>
+
+              <style>{`
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      14% { transform: scale(1.1); }
+      28% { transform: scale(1); }
+      42% { transform: scale(1.1); }
+      70% { transform: scale(1); }
+    }
+  `}</style>
             </div>
           </div>
 

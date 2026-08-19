@@ -166,19 +166,28 @@ export default function CateringBookingForm({
         style={{ backgroundColor: "#F5FAF9" }}
       >
         {/* Header Banner */}
-        <div
-          className="max-w-2xl mx-auto rounded-2xl px-8 py-10 mb-8 text-white text-center shadow-md"
-          style={{ backgroundColor: "#5C9895" }}
-        >
-          <h1 className="text-xl md:text-2xl font-bold mb-3">
-            Book Our Catering Services
-          </h1>
-          <p className="text-sm opacity-90 max-w-md mx-auto leading-relaxed">
-            Fill out the form below and our team will reach out to craft the
-            perfect menu for your special occasion.
-          </p>
-        </div>
+        <div className="max-w-2xl mx-auto rounded-xl mb-8 shadow-md relative overflow-hidden">
+          <img
+            src="/images/form-bg.jpeg"
+            alt=""
+            className="absolute inset-0 w-full h-full object-fill opacity-70"
+          />
 
+          <div className="absolute inset-0 bg-black/70" />
+
+          <div className="relative z-10 text-white text-center px-8 py-10">
+            <h1 className="text-xl md:text-2xl font-bold mb-3">
+              Good Day Repast Catering
+            </h1>
+            <p className="text-sm opacity-90 max-w-md mx-auto leading-relaxed">
+              Honour your loved one with dignity at Good Day Cafeteria. Our
+              all-inclusive repast packages feature delicious pre-packaged
+              meals, a fully air-conditioned venue, PA system, ample parking,
+              clean restrooms, and warm, professional service for family and
+              friends.
+            </p>
+          </div>
+        </div>
         {/* Form Card */}
         <form
           onSubmit={handleSubmit}
