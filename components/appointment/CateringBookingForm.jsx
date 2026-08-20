@@ -168,7 +168,7 @@ export default function CateringBookingForm({
         {/* Header Banner */}
         <div className="max-w-2xl mx-auto rounded-xl mb-8 shadow-md relative overflow-hidden">
           <img
-            src="/images/form-bg.jpeg"
+            src="https://aisetechnologies-bucket.s3.amazonaws.com/upload/media/company_logo/4559.jpg"
             alt=""
             className="absolute inset-0 w-full h-full object-fill opacity-70"
           />
