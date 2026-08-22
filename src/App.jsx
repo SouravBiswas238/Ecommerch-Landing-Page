@@ -96,14 +96,25 @@ export default function App() {
     updateMetaDescription(description);
   }, [companyData]);
 
-  // TODO: uncomment once the backend /storefront/track-visit endpoint is live.
   useEffect(() => {
     if (!companyData?.id || hasTrackedToday()) return;
-  
+
+    let lastOrder = null;
+    try {
+      const stored = JSON.parse(localStorage.getItem("goodday_last_order"));
+      lastOrder = Array.isArray(stored) ? stored[0] : null;
+    } catch {
+      lastOrder = null;
+    }
+    const attributes =
+      lastOrder?.customerName || lastOrder?.customerPhone
+        ? { name: lastOrder?.customerName, phone: lastOrder?.customerPhone }
+        : undefined;
+
     // Mark before the request settles so a down/missing endpoint doesn't
     // retry on every reload for the rest of the day.
     markTrackedToday();
-    trackVisit(companyData.id, getVisitorId()).catch((error) => {
+    trackVisit(companyData.id, getVisitorId(), attributes).catch((error) => {
       console.error("Failed to track visit:", error.message);
     });
   }, [companyData]);

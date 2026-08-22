@@ -410,6 +410,7 @@ const LandingPage = ({ companyData }) => {
           orderNumber: orderData.id ? `GD-${orderData.id}` : null,
           placedAt: new Date().toISOString(),
           customerName: checkoutForm.name,
+          customerPhone: checkoutForm.phone
         };
         let existing = loadOrders().filter((o) => o.uuid !== newOrderObj.uuid);
         existing = [newOrderObj, ...existing].slice(0, 5);
