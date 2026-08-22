@@ -107,7 +107,7 @@ export default function App() {
       console.error("Failed to track visit:", error.message);
     });
   }, [companyData]);
-  console.log(getVisitorId())
+
   
 
   if (new URLSearchParams(window.location.search).get("view") === "analytics") {

@@ -173,7 +173,7 @@ export default function CateringBookingForm({
             className="absolute inset-0 w-full h-full object-fill opacity-70"
           />
 
-          <div className="absolute inset-0 bg-black/70" />
+          <div className="absolute inset-0 bg-black/60" />
 
           <div className="relative z-10 text-white text-center px-8 py-10">
             <h1 className="text-xl md:text-2xl font-bold mb-3">
